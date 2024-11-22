@@ -13,3 +13,7 @@ Route::get('/about', function () {
 Route::get('/login', function () {
     return inertia('Login');
 });
+
+Route::get('/contact', function () {
+    return inertia('Contact');
+});
