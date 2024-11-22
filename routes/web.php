@@ -21,3 +21,7 @@ Route::get('/contact', function () {
 Route::get('/dashboard', function () {
     return inertia('Dashboard');
 });
+
+Route::get('/register', function () {
+    return inertia('Register');
+});
