@@ -10,6 +10,10 @@ Route::get('/about', function () {
     return inertia('Home');
 });
 
+Route::get('/login', function () {
+    return inertia('Login');
+});
+
 Route::get('/contact', function () {
     return inertia('Contact');
 });
