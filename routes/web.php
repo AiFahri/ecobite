@@ -25,3 +25,7 @@ Route::get('/dashboard', function () {
 Route::get('/register', function () {
     return inertia('Register');
 });
+
+Route::get('/transaction', function () {
+    return inertia('Transaction');
+});
