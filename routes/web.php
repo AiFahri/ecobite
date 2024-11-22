@@ -17,3 +17,7 @@ Route::get('/login', function () {
 Route::get('/contact', function () {
     return inertia('Contact');
 });
+
+Route::get('/dashboard', function () {
+    return inertia('Dashboard');
+});
