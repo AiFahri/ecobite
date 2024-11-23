@@ -19,8 +19,8 @@ return new class extends Migration
             $table->bigInteger('discount_price');
             $table->smallInteger('stock');
             $table->timestamps();
-            $table->foreignUlid('tenant_id')->constrained('tenants');
-            $table->foreignUlid('product_type_id')->constrained('product_types');
+            $table->foreignUlid('tenant_id')->constrained('tenants')->onDelete('cascade');
+            $table->foreignUlid('product_type_id')->constrained('product_types')->onDelete('cascade');
         });
     }
 
