@@ -15,8 +15,8 @@ return new class extends Migration
             $table->ulid('id')->primary();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
-            $table->foreignUlid('user_id')->constrained('users');
-            $table->foreignUlid('voucher_id')->constrained('vouchers');
+            $table->foreignUlid('user_id')->constrained('users')->onDelete('cascade');
+            $table->foreignUlid('voucher_id')->constrained('vouchers')->onDelete('cascade');
         });
     }
 
