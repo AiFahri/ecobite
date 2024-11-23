@@ -22,7 +22,7 @@ return new class extends Migration
             $table->decimal('latitude', 10, 7);
             $table->decimal('longitude', 10, 7);
             $table->timestamps();
-            $table->foreignUlid('tenant_type_id')->constrained('tenant_types');
+            $table->foreignUlid('tenant_type_id')->constrained('tenant_types')->onDelete('cascade');
         });
     }
 
