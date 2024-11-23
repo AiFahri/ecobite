@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('vouchers', function (Blueprint $table) {
             $table->ulid('id')->primary();
             $table->string('name');
-            $table->string('description');
+            $table->text('description')->nullable();
             $table->boolean('is_percentage')->default(false);
             $table->bigInteger('amount');
             $table->timestamps();
