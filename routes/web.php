@@ -18,4 +18,8 @@ Route::get('/catalog', function () {
     return Inertia::render('Catalog');
 });
 
+Route::get('/productdetail', function () {
+    return Inertia::render('ProductDetail');
+});
+
 require __DIR__ . '/auth.php';
