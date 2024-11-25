@@ -22,6 +22,11 @@ class DatabaseSeeder extends Seeder
             VouchersSeeder::class,
             UsersSeeder::class,
             UsersVouchersSeeder::class,
+            TenantTypesSeeder::class,
+            ProductTypesSeeder::class,
+            TenantsSeeder::class,
+            ProductsSeeder::class,
+            ProductMediaSeeder::class
         ]);
     }
 }
