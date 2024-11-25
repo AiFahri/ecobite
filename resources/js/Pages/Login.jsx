@@ -6,7 +6,7 @@ import loginBg from '../../assets/path/loginbg.svg'
 import brocolliImg from '../../../resources/assets/path/brocolli.svg';
 import ecobiteImg from '../../../resources/assets/path/Ecobite.svg';
 import googleIcon from '../../../resources/assets/path/google.svg';
-import appleIcon from '../../../resources/assets/path/ic_baseline-apple.svg';
+import facebookIcon from '../../../resources/assets/Facebook_f_logo_(2019).svg.png';
 
 const Login = () => {
     // State untuk password visibility dan form
@@ -66,22 +66,26 @@ const Login = () => {
                         <Link href="/register" className="text-gray-900"> Sign Up</Link>
                     </p>
                     <div className="flex justify-center mb-4 pt-4 mt-7">
-                        <button className="focus:outline-none focus:shadow-outline border rounded-lg px-4 py-2 mr-2 flex items-center">
-                            <img
-                                src={googleIcon}
-                                alt="Google"
-                                className="w-5 h-5 mr-2"
-                            />
-                            Login with Google
-                        </button>
-                        <button className="focus:outline-none focus:shadow-outline border rounded-lg px-4 py-2 mr-2 flex items-center">
-                            <img
-                                src={appleIcon}
-                                alt="Apple"
-                                className="w-5 h-5 mr-2"
-                            />
-                            Login with Apple
-                        </button>
+                        <a href="/auth/google" className="inline-block">
+                            <button className="focus:outline-none focus:shadow-outline border rounded-lg px-4 py-2 mr-2 flex items-center">
+                                <img
+                                    src={googleIcon}
+                                    alt="Google"
+                                    className="w-5 h-5 mr-2"
+                                />
+                                Login with Google
+                            </button>
+                        </a>
+                        <a href="/auth/facebook" className="inline-block">
+                            <button className="focus:outline-none focus:shadow-outline border rounded-lg px-4 py-2 mr-2 flex items-center">
+                                <img
+                                    src={facebookIcon}
+                                    alt="Facebook"
+                                    className="w-5 h-5 mr-2"
+                                />
+                                Login with Facebook
+                            </button>
+                        </a>    
                     </div>
                     <div className="flex items-center justify-center mb-4 mt-10">
                         <div className="flex-grow border-t border-[#D7D7D7]"></div>
