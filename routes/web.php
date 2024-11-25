@@ -14,4 +14,8 @@ Route::middleware('auth')->group(function () {
     })->name('dashboard');
 });
 
+Route::get('/catalog', function () {
+    return Inertia::render('Catalog');
+});
+
 require __DIR__ . '/auth.php';
