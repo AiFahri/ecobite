@@ -1,15 +1,16 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
 Route::get('/', function () {
-    return inertia('Home');
+    return Inertia::render('Welcome');
 });
 
-Route::get('/register', function () {
-    return inertia('Register');
+Route::middleware('auth')->group(function () {
+    Route::get('/dashboard', function () {
+        return Inertia::render('Dashboard');
+    })->name('dashboard');
 });
 
-Route::get('/login', function () {
-    return inertia('Login');
-});
+require __DIR__ . '/auth.php';
