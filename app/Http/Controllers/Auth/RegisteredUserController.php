@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Inertia\Inertia;
 use Inertia\Response;
+use Illuminate\Support\Facades\Log;
 
 class RegisteredUserController extends Controller
 {
@@ -47,6 +48,10 @@ class RegisteredUserController extends Controller
         event(new Registered($user));
 
         Auth::login($user);
+
+        Log::info('User: ' . json_encode(Auth::user()));
+        Log::info('id: ' . json_encode(Auth::id()));
+        Log::info('id: ' . json_encode(Auth::check()));
 
         return redirect(route('dashboard', absolute: false));
     }
