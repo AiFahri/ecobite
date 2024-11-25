@@ -13,8 +13,22 @@ export default {
         extend: {
             fontFamily: {
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],
+                outfit: ["Outfit", "sans-serif"],
             },
         },
     },
-    plugins: [],
+    plugins: [
+        function ({ addUtilities }) {
+          const newUtilities = {
+            ".no-scrollbar::-webkit-scrollbar": {
+              display: "none",
+            },
+            ".noscrollbar": {
+              "-ms-overflow-style": "none",
+              "scrollbar-width": "none",
+            },
+          };
+          addUtilities(newUtilities);
+        },
+    ],
 };
