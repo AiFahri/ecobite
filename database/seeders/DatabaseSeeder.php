@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -17,7 +18,10 @@ class DatabaseSeeder extends Seeder
             ProductTypesSeeder::class,
             TenantsSeeder::class,
             ProductsSeeder::class,
-            ProductMediaSeeder::class
+            ProductMediaSeeder::class,
+            VouchersSeeder::class,
+            UsersSeeder::class,
+            UsersVouchersSeeder::class,
         ]);
     }
 }
