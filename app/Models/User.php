@@ -56,4 +56,9 @@ class User extends Authenticatable
     {
         return $this->id; // Misalnya, jika kolom ULID di model adalah `ulid`
     }
+
+    public function wishlists()
+    {
+        return $this->hasMany(Wishlist::class, 'user_id', 'id');
+    }
 }

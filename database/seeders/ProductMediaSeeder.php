@@ -21,6 +21,7 @@ class ProductMediaSeeder extends Seeder
         foreach ($productIds as $product) {
             DB::table('product_media')->insert([
                 'id' => (string) \Illuminate\Support\Str::ulid(),
+                'photo_url' => $faker->imageUrl(),
                 'created_at' => now(),
                 'updated_at' => now(),
                 'product_id' => $product,
@@ -28,6 +29,7 @@ class ProductMediaSeeder extends Seeder
 
             DB::table('product_media')->insert([
                 'id' => (string) \Illuminate\Support\Str::ulid(),
+                'photo_url' => $faker->imageUrl(),
                 'created_at' => now(),
                 'updated_at' => now(),
                 'product_id' => $product,
