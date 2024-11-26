@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Inertia\Response;
 use Illuminate\Support\Facades\Log;
+use Illuminate\View\View;
 
 class AuthenticatedSessionController extends Controller
 {
@@ -22,6 +23,11 @@ class AuthenticatedSessionController extends Controller
         return Inertia::render('Login');
     }
 
+    public function create2(): Response
+    {
+        return Inertia::render('Auth/Login');
+    }
+
     /**
      * Handle an incoming authentication request.
      */
@@ -30,7 +36,7 @@ class AuthenticatedSessionController extends Controller
         $request->authenticate();
 
         $request->session()->regenerate();
-        \Log::info('Session regenerated: ' . session()->getId());
+        Log::info('Session regenerated: ' . session()->getId());
 
         return redirect()->intended(route('dashboard'));
     }

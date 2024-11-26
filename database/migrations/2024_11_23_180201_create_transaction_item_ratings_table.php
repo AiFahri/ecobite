@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('transaction_item_ratings', function (Blueprint $table) {
             $table->ulid('id')->primary();
             $table->text('feedback')->nullable();
-            $table->smallInteger('start');
+            $table->smallInteger('star');
             $table->timestamps();
             $table->foreignUlid('transaction_item_id')->constrained('transaction_items')->onDelete('cascade');
         });

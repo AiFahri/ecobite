@@ -27,7 +27,7 @@ class ProductsSeeder extends Seeder
                 'description' => $faker->text(50),
                 'price' => $price = $faker->numberBetween(10000, 100000),
                 'discount_price' => $faker->numberBetween(10000, $price),
-                'stock' => $faker->numberBetween(1, 20),
+                'stock' => $faker->numberBetween(5, 20),
                 'created_at' => now(),
                 'updated_at' => now(),
                 'tenant_id' => $faker->randomElement($tenantIds),
