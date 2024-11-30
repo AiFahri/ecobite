@@ -8,7 +8,6 @@ use App\Models\Product;
 use App\Models\ProductType;
 use App\Http\Resources\ProductResource;
 use App\Http\Resources\ReviewResource;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class CatalogController extends Controller
@@ -57,11 +56,26 @@ class CatalogController extends Controller
             ->with(['transactionItem.transaction.address.user'])
             ->paginate(5); // 5 items per page
 
+        $similar_products = Product::with('productType')
+            ->select('products.*')
+            ->join('product_types', 'products.product_type_id', '=', 'product_types.id')
+            ->join('transaction_items', 'products.id', '=', 'transaction_items.product_id')
+            ->join('transaction_item_ratings', 'transaction_items.id', '=', 'transaction_item_ratings.transaction_item_id')
+            ->where('product_types.name', $product->productType->name)
+            ->where('products.id', '!=', $productID)
+            ->groupBy('products.id')
+            ->selectRaw('AVG(transaction_item_ratings.star) as avg_stars')
+            ->orderBy('avg_stars', 'DESC')
+            ->limit(16)
+            ->get();
+
         ReviewResource::collection($ratings);
 
         // Gabungkan ratings yang dipaginate ke dalam response
-        return (new ProductResource($product))->additional([
-            'reviews' => $ratings
+        return response()->json([
+            'product' => new ProductResource($product),
+            'reviews' => $ratings,
+            'similar_products' => CatalogResource::collection($similar_products),
         ]);
     }
 }
