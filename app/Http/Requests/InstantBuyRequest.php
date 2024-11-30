@@ -22,8 +22,9 @@ class InstantBuyRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'product_id' => ['required', 'exists:products,id'], // Validasi product_id harus ada di tabel products
-            'quantity' => ['required', 'integer', 'min:1'], // Kuantitas harus angka bulat dan minimal 1
+            'products' => ['required', 'array', 'min:1'], // Harus berupa array dengan minimal satu produk
+            'products.*.product_id' => ['required', 'exists:products,id'], // Validasi setiap product_id harus ada di tabel products
+            'products.*.quantity' => ['required', 'integer', 'min:1'], // Validasi setiap quantity harus angka bulat minimal 1
             'voucher_id' => ['nullable', 'exists:user_vouchers,id'], // Voucher opsional, tetapi harus valid jika ada
         ];
     }
