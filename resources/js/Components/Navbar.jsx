@@ -11,7 +11,7 @@ const Navbar = () => {
                     </span>
                     <ul className="flex items-center">
                         <li className="mr-14 text-slate-500 hover:text-slate-900 hover:underline hover:underline-offset-2">
-                            <a href="#">Home</a>
+                            <a href="/">Home</a>
                         </li>
                         <li className="mr-14 text-slate-500 hover:text-slate-900 hover:underline hover:underline-offset-2">
                             <a href="/catalog">Catalog</a>
