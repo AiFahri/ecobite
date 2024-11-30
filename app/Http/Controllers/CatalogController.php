@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\CatalogResource;
 use App\Models\TenantType;
 use App\Models\Product;
 use App\Models\ProductType;
 use App\Http\Resources\ProductResource;
+use App\Http\Resources\ReviewResource;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class CatalogController extends Controller
@@ -39,8 +42,26 @@ class CatalogController extends Controller
             ->get();
 
         // Return data
-        ProductResource::collection($products);
+        CatalogResource::collection($products);
         return response()->json(['products' => $products, 'product_types' => $productTypes, 'tenant_types' => $tenantTypes, 'star_count' => $starCount]);
         // return ['key' => ProductResource::collection($products)->response()->getData(true)];
+    }
+
+    public function show($productID)
+    {
+
+        $product = Product::with(['tenant', 'productMedia'])->findOrFail($productID);
+
+        // Paginate ratings
+        $ratings = $product->ratings()
+            ->with(['transactionItem.transaction.address.user'])
+            ->paginate(5); // 5 items per page
+
+        ReviewResource::collection($ratings);
+
+        // Gabungkan ratings yang dipaginate ke dalam response
+        return (new ProductResource($product))->additional([
+            'reviews' => $ratings
+        ]);
     }
 }
