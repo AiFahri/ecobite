@@ -24,7 +24,9 @@ Route::get('/catalog', function () {
 Route::get('/productdetail', function () {
     return Inertia::render('ProductDetail');
 });
+
 Route::get('/products', [CatalogController::class, 'index'])->name('products.index');
+Route::get('/products/{productID}', [CatalogController::class, 'show'])->name('products.show');
 
 Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('login.post');
 
