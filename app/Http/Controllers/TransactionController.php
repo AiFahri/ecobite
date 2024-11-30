@@ -21,11 +21,20 @@ class TransactionController extends Controller
             ->orderByDesc('is_primary')
             ->get();
 
-        $product = Product::with(['productType', 'productMedia'])
-            ->where('id', Session::get('instant-buy')['product_id'])
-            ->first();
+        // Proses setiap produk dari session
+        $products = [];
+        foreach (Session::get('instant-buy')['products'] as $item) {
+            $product = Product::with(['productType', 'productMedia'])
+                ->where('id', $item['product_id'])
+                ->first();
 
-        $product->quantity = Session::get('instant-buy')['quantity'];
+            if ($product) {
+                // Tambahkan quantity ke produk
+                $product->quantity = $item['quantity'] ?? 1; // Default quantity = 1 jika tidak ada
+                $products[] = $product;
+            }
+        }
+
 
         $voucherId = Session::get('instant-buy')['voucher_id'] ?? null;
 
@@ -39,7 +48,7 @@ class TransactionController extends Controller
 
         return response()->json([
             'addresses' => $addresses,
-            'product' => $product,
+            'products' => $products,
             'voucher' => $vouchers,
         ]);
     }
