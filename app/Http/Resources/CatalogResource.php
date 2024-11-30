@@ -14,6 +14,9 @@ class CatalogResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+
+        // dd($this->productMedia);
+
         return [
             'product' => [
                 'id' => $this->id,
