@@ -4,6 +4,7 @@ use App\Http\Controllers\CatalogController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
 
 
 Route::get('/', function () {
@@ -24,5 +25,7 @@ Route::get('/productdetail', function () {
     return Inertia::render('ProductDetail');
 });
 Route::get('/products', [CatalogController::class, 'index'])->name('products.index');
+
+Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('login.post');
 
 require __DIR__ . '/auth.php';

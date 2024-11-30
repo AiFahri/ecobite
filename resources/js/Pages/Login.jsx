@@ -1,40 +1,57 @@
-import { useState } from 'react';
-import { Link } from '@inertiajs/react';
+import { useState } from "react";
+import { Link, router } from "@inertiajs/react";
 
-// Import gambar
-import loginBg from '../../assets/path/loginbg.svg'
-import brocolliImg from '../../../resources/assets/path/brocolli.svg';
-import ecobiteImg from '../../../resources/assets/path/Ecobite.svg';
-import googleIcon from '../../../resources/assets/path/google.svg';
-import facebookIcon from '../../../resources/assets/Facebook_f_logo_(2019).svg.png';
+import loginBg from "../../assets/path/loginbg.svg";
+import brocolliImg from "../../../resources/assets/path/brocolli.svg";
+import ecobiteImg from "../../../resources/assets/path/Ecobite.svg";
+import googleIcon from "../../../resources/assets/path/google.svg";
+import facebookIcon from "../../../resources/assets/Facebook_f_logo_(2019).svg.png";
 
 const Login = () => {
-    // State untuk password visibility dan form
     const [showPassword, setShowPassword] = useState(false);
     const [rememberMe, setRememberMe] = useState(false);
+    const [processing, setProcessing] = useState(false);
     const [formData, setFormData] = useState({
-        email: '',
-        password: ''
+        email: "",
+        password: "",
     });
+    const [errors, setErrors] = useState({});
 
-    // Handle toggle password visibility
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
     };
 
-    // Handle input change
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prev => ({
+        setFormData((prev) => ({
             ...prev,
-            [name]: value
+            [name]: value,
         }));
     };
 
-    // Handle form submit
     const handleSubmit = (e) => {
         e.preventDefault();
-        // Tambahkan logika submit form di sini
+
+        router.post(
+            "/login",
+            {
+                email: formData.email,
+                password: formData.password,
+                remember: rememberMe,
+            },
+            {
+                onSuccess: () => {},
+                onError: (errors) => {
+                    setErrors(errors);
+                },
+                onStart: () => {
+                    setProcessing(true);
+                },
+                onFinish: () => {
+                    setProcessing(false);
+                },
+            }
+        );
     };
 
     return (
@@ -60,10 +77,15 @@ const Login = () => {
                         alt="EcoBite"
                         className="w-32 mx-auto mb-4"
                     />
-                    <h2 className="text-center text-3xl mb-4 font-semibold">Welcome Back!</h2>
+                    <h2 className="text-center text-3xl mb-4 font-semibold">
+                        Welcome Back!
+                    </h2>
                     <p className="text-center mb-4 text-gray-400">
                         Don't have an account yet?
-                        <Link href="/register" className="text-gray-900"> Sign Up</Link>
+                        <Link href="/register" className="text-gray-900">
+                            {" "}
+                            Sign Up
+                        </Link>
                     </p>
                     <div className="flex justify-center mb-4 pt-4 mt-7">
                         <a href="/auth/google" className="inline-block">
@@ -85,14 +107,19 @@ const Login = () => {
                                 />
                                 Login with Facebook
                             </button>
-                        </a>    
+                        </a>
                     </div>
                     <div className="flex items-center justify-center mb-4 mt-10">
                         <div className="flex-grow border-t border-[#D7D7D7]"></div>
-                        <span className="px-3 text-gray-500">Or Sign Through</span>
+                        <span className="px-3 text-gray-500">
+                            Or Sign Through
+                        </span>
                         <div className="flex-grow border-t border-[#D7D7D7]"></div>
                     </div>
-                    <form onSubmit={handleSubmit} className="rounded px-7 pt-6 pb-8 mb-4">
+                    <form
+                        onSubmit={handleSubmit}
+                        className="rounded px-7 pt-6 pb-8 mb-4"
+                    >
                         <div className="mb-4">
                             <label
                                 className="block text-gray-700 text-sm font-semibold mb-2"
@@ -109,6 +136,11 @@ const Login = () => {
                                 value={formData.email}
                                 onChange={handleInputChange}
                             />
+                            {errors.email && (
+                                <div className="text-red-500 text-xs mt-1">
+                                    {errors.email}
+                                </div>
+                            )}
                         </div>
                         <div className="mb-6 relative">
                             <label
@@ -132,9 +164,20 @@ const Login = () => {
                                     onClick={togglePasswordVisibility}
                                     className="focus:outline-none mt-4"
                                 >
-                                    <i className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
+                                    <i
+                                        className={`fas ${
+                                            showPassword
+                                                ? "fa-eye-slash"
+                                                : "fa-eye"
+                                        }`}
+                                    ></i>
                                 </button>
                             </div>
+                            {errors.password && (
+                                <div className="text-red-500 text-xs mt-1">
+                                    {errors.password}
+                                </div>
+                            )}
                         </div>
                         <div className="flex items-center justify-between mb-4">
                             <label className="inline-flex items-center">
@@ -142,7 +185,9 @@ const Login = () => {
                                     type="checkbox"
                                     className="form-checkbox"
                                     checked={rememberMe}
-                                    onChange={(e) => setRememberMe(e.target.checked)}
+                                    onChange={(e) =>
+                                        setRememberMe(e.target.checked)
+                                    }
                                 />
                                 <span className="ml-2">Remember Me</span>
                             </label>
@@ -157,8 +202,9 @@ const Login = () => {
                             <button
                                 className="bg-[#A1E870] hover:bg-green-700 py-2 px-56 ml-2 rounded focus:outline-none focus:shadow-outline"
                                 type="submit"
+                                disabled={processing}
                             >
-                                Sign In
+                                {processing ? "Loading..." : "Sign In"}
                             </button>
                         </div>
                     </form>
