@@ -5,6 +5,8 @@ import ReviewsStatus from "../../../assets/Reviews + Status.svg";
 const ReviewItem = ({ review }) => {
     console.log("Review Item:", review);
 
+    review = review.data;
+
     return (
         <div className="py-4">
             <div className="flex items-start">
@@ -15,8 +17,7 @@ const ReviewItem = ({ review }) => {
                 />
                 <div className="ml-4">
                     <h3 className="font-semibold">
-                        {review?.transaction_item?.transaction?.address?.user
-                            ?.name || "Anonymous"}
+                        {review?.full_name || "Anonymous"}
                     </h3>
                     <div className="flex items-center mt-1">
                         {[...Array(5)].map((_, i) => (
@@ -30,7 +31,7 @@ const ReviewItem = ({ review }) => {
                             </span>
                         ))}
                         <span className="ml-2 text-gray-500">
-                            {new Date(review.data.created_at).toLocaleDateString()}
+                            {new Date(review.created_at).toLocaleDateString()}
                         </span>
                     </div>
                     <p className="mt-2">{review.feedback}</p>
