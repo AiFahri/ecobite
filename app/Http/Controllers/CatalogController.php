@@ -61,10 +61,8 @@ class CatalogController extends Controller
             ->join('product_types', 'products.product_type_id', '=', 'product_types.id')
             ->join('transaction_items', 'products.id', '=', 'transaction_items.product_id')
             ->join('transaction_item_ratings', 'transaction_items.id', '=', 'transaction_item_ratings.transaction_item_id')
-            ->where('product_types.name', $product->productType->name)
-            ->where('products.id', '!=', $productID)
             ->groupBy('products.id')
-            ->selectRaw('AVG(transaction_item_ratings.star) as avg_stars')
+            ->selectRaw('FLOOR(AVG(transaction_item_ratings.star)) as avg_stars')
             ->orderBy('avg_stars', 'DESC')
             ->limit(16)
             ->get();
