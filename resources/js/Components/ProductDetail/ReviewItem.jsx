@@ -30,7 +30,7 @@ const ReviewItem = ({ review }) => {
                             </span>
                         ))}
                         <span className="ml-2 text-gray-500">
-                            {new Date(review.created_at).toLocaleDateString()}
+                            {new Date(review.data.created_at).toLocaleDateString()}
                         </span>
                     </div>
                     <p className="mt-2">{review.feedback}</p>
