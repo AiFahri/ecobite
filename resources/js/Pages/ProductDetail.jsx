@@ -24,8 +24,7 @@ const ProductDetail = () => {
     if (!productData) {
         return <div>Loading...</div>;
     }
-
-    // Pastikan photo_urls ada dan memiliki item
+    console.log(productData);
     const mainPhoto = productData?.photo_urls?.[0] || "";
     const additionalPhotos = productData?.photo_urls?.slice(1) || [];
 
@@ -72,7 +71,7 @@ const ProductDetail = () => {
                             <div className="flex">
                                 <span className="relative">
                                     <img src={EllipseIcon} alt="Store" />
-                                    {tenantData?.is_verified && (
+                                    {tenantData?.is_verified === 1 && (
                                         <div className="w-5 h-5 bg-green-300 rounded-full absolute bottom-0 right-0" />
                                     )}
                                 </span>
@@ -140,7 +139,7 @@ const ProductDetail = () => {
                         </div>
 
                         {reviews && meta && (
-                            <div className="divide-y divide-solid divide-slate-200 border border-slate-200 rounded-lg p-4 mt-16">
+                            <div className="divide-y divide-solid divide-slate-200 border border-slate-200 rounded-lg p-4 mt-16 mb-16">
                                 <div>
                                     <div className="flex justify-between items-center">
                                         <span>

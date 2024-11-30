@@ -15,7 +15,7 @@ import { useState, useEffect } from "react";
 import { usePage } from "@inertiajs/react";
 
 const Payment = () => {
-    const { product, quantity } = usePage().props;
+    const { product, quantity, delivery_fee, promo_voucher } = usePage().props;
 
     console.log("Payment Page Props:", usePage().props);
 
@@ -31,13 +31,8 @@ const Payment = () => {
         );
     }
 
-    const productData = product.data.product;
-    const tenantData = product.data.tenant;
-
-    const basePrice = productData.price * quantity;
-    const deliveryFee = 10000;
-    const promoVoucher = 10000;
-    const totalPrice = basePrice + deliveryFee - promoVoucher;
+    const basePrice = product.price * quantity;
+    const totalPrice = basePrice + delivery_fee - promo_voucher;
 
     const [activeAccordion, setActiveAccordion] = useState(null);
     const [selectedPayment, setSelectedPayment] = useState(null);
@@ -66,7 +61,7 @@ const Payment = () => {
                         <p className="text-[#173302]">Payment</p>
                     </span>
                     <h2 className="text-2xl my-6 text-[#173302] font-semibold">
-                        {productData.name}
+                        {product.name}
                     </h2>
                 </div>
             </section>
@@ -110,15 +105,15 @@ const Payment = () => {
                             <div className="flex justify-between items-center">
                                 <span className="flex items-center">
                                     <img
-                                        src={productData.photo_urls[0]}
-                                        alt={productData.name}
+                                        src={product.photo_url}
+                                        alt={product.name}
                                         className="w-16 h-16 object-cover rounded"
                                     />
                                     <span className="ml-2">
                                         <p className="text-xs text-gray-400">
-                                            {tenantData?.name}
+                                            {product.tenant.name}
                                         </p>
-                                        <p>{productData.name}</p>
+                                        <p>{product.name}</p>
                                     </span>
                                 </span>
                                 <span>
@@ -365,14 +360,16 @@ const Payment = () => {
                                         <p className="text-gray-400">
                                             Delivery (Estimation)
                                         </p>
-                                        <p>Rp {deliveryFee.toLocaleString()}</p>
+                                        <p>
+                                            Rp {delivery_fee.toLocaleString()}
+                                        </p>
                                     </div>
                                     <div className="flex justify-between">
                                         <p className="text-gray-400">
                                             Promo Voucher
                                         </p>
                                         <p>
-                                            Rp {promoVoucher.toLocaleString()}
+                                            Rp {promo_voucher.toLocaleString()}
                                         </p>
                                     </div>
                                 </div>

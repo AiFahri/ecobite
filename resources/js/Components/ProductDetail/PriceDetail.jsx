@@ -3,23 +3,28 @@ import { router } from "@inertiajs/react";
 
 const PriceDetail = ({ product }) => {
     const [quantity, setQuantity] = useState(1);
-    const [notes, setNotes] = useState("");
     const [availableStock, setAvailableStock] = useState(product.stocks);
 
     const handleQuantityChange = (action) => {
-        if (action === "increase" && quantity < availableStock) {
+        if (action === "increase" && quantity < product.stocks) {
             setQuantity((prev) => prev + 1);
-            setAvailableStock((prev) => prev - 1);
         } else if (action === "decrease" && quantity > 1) {
             setQuantity((prev) => prev - 1);
-            setAvailableStock((prev) => prev + 1);
         }
     };
 
     const basePrice = product.price * quantity;
     const deliveryFee = 10000;
-    const promoVoucher = 10000; // Ini bisa dinamis dari backend
+    const promoVoucher = 10000;
     const totalPrice = basePrice + deliveryFee - promoVoucher;
+
+    const handleBuyNow = () => {
+        router.get(`/payment?product_id=${product.id}&quantity=${quantity}`);
+    };
+
+    const handleAddToCart = () => {
+        router.get(`/cart?product_id=${product.id}&quantity=${quantity}`);
+    };
 
     return (
         <div className="border border-slate-200 rounded-lg p-6 space-y-6">
@@ -41,27 +46,18 @@ const PriceDetail = ({ product }) => {
                         <button
                             onClick={() => handleQuantityChange("increase")}
                             className="px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-r-lg"
-                            disabled={quantity >= availableStock}
+                            disabled={quantity >= product.stocks}
                         >
                             +
                         </button>
                     </div>
                     <span className="text-gray-500">
-                        Stock Total: {availableStock} pcs
+                        Stock Total:{" "}
+                        <span className="font-bold text-black">
+                            {product.stocks - quantity} pcs
+                        </span>
                     </span>
                 </div>
-            </div>
-
-            {/* Notes Section */}
-            <div>
-                <p className="mb-3">Notes</p>
-                <textarea
-                    value={notes}
-                    onChange={(e) => setNotes(e.target.value)}
-                    placeholder="Enter your notes here ..."
-                    className="w-full p-3 border rounded-lg resize-none"
-                    rows="2"
-                />
             </div>
 
             {/* Promo Section */}
@@ -105,7 +101,10 @@ const PriceDetail = ({ product }) => {
                 <div className="space-y-2">
                     <div className="flex justify-between">
                         <span className="text-gray-600">
-                            Item Quantity ({quantity}pcs)
+                            Item Quantity{" "}
+                            <span className="font-bold text-black">
+                                ({quantity}pcs)
+                            </span>
                         </span>
                         <span>Rp {basePrice.toLocaleString()}</span>
                     </div>
@@ -132,27 +131,16 @@ const PriceDetail = ({ product }) => {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                     <button
-                        onClick={() =>
-                            router.get(
-                                route("payment.index", {
-                                    product_id: product.id,
-                                    quantity: quantity,
-                                })
-                            )
-                        }
+                        onClick={handleBuyNow}
                         className="w-full py-3 bg-[#A1E870] rounded-lg font-semibold"
-                        disabled={quantity < 1 || quantity > availableStock}
+                        disabled={quantity < 1 || product.stocks === 0}
                     >
                         Buy Now
                     </button>
                     <button
-                        onClick={() =>
-                            router.get(
-                                `/cart/add/${product.id}?quantity=${quantity}`
-                            )
-                        }
+                        onClick={handleAddToCart}
                         className="w-full py-3 border border-[#A1E870] rounded-lg font-semibold"
-                        disabled={quantity < 1 || quantity > availableStock}
+                        disabled={quantity < 1 || product.stocks === 0}
                     >
                         Add to Cart
                     </button>

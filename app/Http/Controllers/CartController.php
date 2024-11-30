@@ -6,29 +6,47 @@ use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Cart;
 use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
 
 class CartController extends Controller
 {
     //
 
-    public function show()
+    public function index(Request $request)
     {
+        $request->validate([
+            'product_id' => 'required|exists:products,id',
+            'quantity' => 'required|integer|min:1',
+        ]);
 
-        $carts = Cart::with(['product.productMedia'])
-            ->where('user_id', Auth::id())
-            ->get();
+        // Tambahkan produk ke cart
+        Cart::updateOrCreate(
+            [
+                'user_id' => Auth::id(),
+                'product_id' => $request->product_id
+            ],
+            [
+                'quantity' => $request->quantity
+            ]
+        );
 
-        $similar_products = Product::with('productType')
-            ->select('products.*')
-            ->join('product_types', 'products.product_type_id', '=', 'product_types.id')
-            ->join('transaction_items', 'products.id', '=', 'transaction_items.product_id')
-            ->join('transaction_item_ratings', 'transaction_items.id', '=', 'transaction_item_ratings.transaction_item_id')
-            ->groupBy('products.id')
-            ->selectRaw('FLOOR(AVG(transaction_item_ratings.star)) as avg_stars')
-            ->orderBy('avg_stars', 'DESC')
-            ->limit(16)
-            ->get();
+        $product = Product::with(['productMedia', 'tenant'])->findOrFail($request->product_id);
 
-        return response()->json(['carts' => $carts, 'similar_products' => $similar_products]);
+        return Inertia::render('Cart', [
+            'product' => [
+                'id' => $product->id,
+                'name' => $product->name,
+                'price' => $product->price,
+                'photo_url' => $product->productMedia->first()?->photo_url,
+                'tenant' => [
+                    'name' => $product->tenant->name,
+                    'city' => $product->tenant->city,
+                    'state' => $product->tenant->state,
+                ],
+            ],
+            'quantity' => (int) $request->quantity,
+            'delivery_fee' => 10000,
+            'promo_voucher' => 10000,
+        ]);
     }
 }

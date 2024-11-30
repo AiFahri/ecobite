@@ -150,28 +150,39 @@ const Catalog = () => {
 
                             <div className="col-span-3">
                                 <div className="grid grid-cols-3 gap-6 mt-10">
-                                    {products?.data?.map((product) => (
-                                        <ProductCard
-                                            key={product.id}
-                                            product={{
-                                                id: product.id,
-                                                image:
-                                                    product.product_media?.[0]
-                                                        ?.url || DiscountImage,
-                                                name: product.name,
-                                                store:
-                                                    product.tenant?.name ||
-                                                    "Unknown Store",
-                                                price: product.price,
-                                                oldPrice:
-                                                    product.original_price,
-                                                verified:
-                                                    product.tenant
-                                                        ?.is_verified || false,
-                                                rating: product.ratings_avg_star,
-                                            }}
-                                        />
-                                    ))}
+                                    {products?.data?.map((product) => {
+                                        console.log("Product Data:", product);
+                                        return (
+                                            <ProductCard
+                                                key={product.id}
+                                                product={{
+                                                    id: product.id,
+                                                    image:
+                                                        Array.isArray(
+                                                            product.product_media
+                                                        ) &&
+                                                        product.product_media
+                                                            .length > 0
+                                                            ? product
+                                                                  .product_media[0]
+                                                                  .photo_url
+                                                            : DiscountImage,
+                                                    name: product.name,
+                                                    store:
+                                                        product.tenant?.name ||
+                                                        "Unknown Store",
+                                                    price: product.price,
+                                                    oldPrice:
+                                                        product.original_price,
+                                                    verified:
+                                                        product.tenant
+                                                            ?.is_verified ||
+                                                        false,
+                                                    rating: product.ratings_avg_star,
+                                                }}
+                                            />
+                                        );
+                                    })}
                                 </div>
 
                                 <div className="mt-8">
@@ -190,23 +201,73 @@ const Catalog = () => {
                                         </p>
 
                                         <span className="flex">
-                                            {products?.links?.map((link, i) => (
-                                                <button
-                                                    key={i}
-                                                    className={`p-2 mx-1 ${
-                                                        link.active
-                                                            ? "bg-[#173302] text-white"
-                                                            : "border border-slate-200"
-                                                    } rounded-md w-10 h-10 text-center`}
-                                                    onClick={() =>
-                                                        link.url &&
-                                                        router.get(link.url)
-                                                    }
-                                                    dangerouslySetInnerHTML={{
-                                                        __html: link.label,
-                                                    }}
-                                                />
-                                            ))}
+                                            {products?.links?.map((link, i) => {
+                                                if (
+                                                    link.label ===
+                                                    "&laquo; Previous"
+                                                ) {
+                                                    return (
+                                                        <button
+                                                            key={i}
+                                                            className={`p-2 mx-1 ${
+                                                                link.active
+                                                                    ? "bg-[#173302] text-white"
+                                                                    : "border border-slate-200"
+                                                            } rounded-md w-10 h-10 text-center`}
+                                                            onClick={() =>
+                                                                link.url &&
+                                                                router.get(
+                                                                    link.url
+                                                                )
+                                                            }
+                                                            disabled={!link.url}
+                                                        >
+                                                            &lt;
+                                                        </button>
+                                                    );
+                                                }
+                                                if (
+                                                    link.label ===
+                                                    "Next &raquo;"
+                                                ) {
+                                                    return (
+                                                        <button
+                                                            key={i}
+                                                            className={`p-2 mx-1 ${
+                                                                link.active
+                                                                    ? "bg-[#173302] text-white"
+                                                                    : "border border-slate-200"
+                                                            } rounded-md w-10 h-10 text-center`}
+                                                            onClick={() =>
+                                                                link.url &&
+                                                                router.get(
+                                                                    link.url
+                                                                )
+                                                            }
+                                                            disabled={!link.url}
+                                                        >
+                                                            &gt;
+                                                        </button>
+                                                    );
+                                                }
+                                                return (
+                                                    <button
+                                                        key={i}
+                                                        className={`p-2 mx-1 ${
+                                                            link.active
+                                                                ? "bg-[#173302] text-white"
+                                                                : "border border-slate-200"
+                                                        } rounded-md w-10 h-10 text-center`}
+                                                        onClick={() =>
+                                                            link.url &&
+                                                            router.get(link.url)
+                                                        }
+                                                        dangerouslySetInnerHTML={{
+                                                            __html: link.label,
+                                                        }}
+                                                    />
+                                                );
+                                            })}
                                         </span>
                                     </div>
                                 </div>
