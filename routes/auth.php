@@ -3,8 +3,11 @@
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\OauthController;
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\TransactionController;
 use Illuminate\Container\Attributes\Auth;
 use Illuminate\Support\Facades\Route;
+use PHPUnit\Event\Tracer\Tracer;
 
 Route::middleware('guest')->group(function () {
     Route::get('register', [RegisteredUserController::class, 'create'])->name('register');
@@ -25,4 +28,6 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::get('logout', [AuthenticatedSessionController::class, 'destroy'])
         ->name('logout');
+
+    Route::get('/cart', [CartController::class, 'show'])->name('cart');
 });

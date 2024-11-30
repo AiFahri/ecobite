@@ -66,4 +66,11 @@ class User extends Authenticatable
     {
         return $this->hasMany(Address::class, 'user_id');
     }
+
+    public function vouchers()
+    {
+        return $this->belongsToMany(Voucher::class, 'user_vouchers', 'user_id', 'voucher_id')
+            ->withPivot('is_active')
+            ->withTimestamps();
+    }
 }

@@ -15,23 +15,24 @@ class DatabaseSeeder extends Seeder
             // Master Data
             TenantTypesSeeder::class,
             ProductTypesSeeder::class,
-            
+
             // Core Data
             TenantsSeeder::class,
             ProductsSeeder::class,
             ProductMediaSeeder::class,
-            
+
             // User Related
             UsersSeeder::class,
             AddressesSeeder::class,
-            
+
             // Features
             VouchersSeeder::class,
             UsersVouchersSeeder::class,
             WishlistsSeeder::class,
-            
+
             // Transactions
             TransactionSeeder::class,
+            CartsSeeder::class,
         ]);
     }
 }
