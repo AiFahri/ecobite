@@ -2,17 +2,23 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\CatalogResource;
 use App\Models\TenantType;
 use App\Models\Product;
 use App\Models\ProductType;
 use App\Http\Resources\ProductResource;
+use App\Http\Resources\ReviewResource;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Inertia\Inertia;
 
 class CatalogController extends Controller
 {
     public function index()
     {
-        $products = Product::with(['productMedia', 'tenant'])->withAvg('ratings', 'star')->paginate(18);
+        $products = Product::with(['productMedia', 'tenant'])
+            ->withAvg('ratings', 'star')
+            ->paginate(12);
 
         $productTypes = ProductType::withCount('products')
             ->orderBy('products_count', 'DESC')
@@ -32,15 +38,50 @@ class CatalogController extends Controller
             ->groupBy('ti.product_id');
 
         $starCount = DB::table(DB::raw("({$subquery->toSql()}) as grouped_ratings"))
-            ->mergeBindings($subquery) // Pastikan parameter dari subquery terhubung
+            ->mergeBindings($subquery)
             ->selectRaw('rating_group, COUNT(*) as total_products')
             ->groupBy('rating_group')
             ->orderBy('rating_group', 'DESC')
             ->get();
 
         // Return data
-        ProductResource::collection($products);
-        return response()->json(['products' => $products, 'product_types' => $productTypes, 'tenant_types' => $tenantTypes, 'star_count' => $starCount]);
+        // CatalogResource::collection($products);
+       
         // return ['key' => ProductResource::collection($products)->response()->getData(true)];
+        return Inertia::render('Catalog', [
+            'products' => $products,
+            'productTypes' => $productTypes,
+            'tenantTypes' => $tenantTypes,
+            'starCount' => $starCount,
+            'filters' => request()->only(['search', 'type', 'rating'])
+        ]);
+    }
+
+    public function show($productID)
+    {
+        $product = Product::with(['tenant', 'productMedia'])->findOrFail($productID);
+        
+        // Paginate ratings
+        $ratings = $product->ratings()
+            ->with(['transactionItem.transaction.address.user'])
+            ->paginate(5);
+
+        return Inertia::render('ProductDetail', [
+            'product' => new ProductResource($product),
+            'reviews' => [
+                'data' => $ratings->items(),
+                'links' => $ratings->links(),
+                'meta' => [
+                    'from' => $ratings->firstItem(),
+                    'to' => $ratings->lastItem(),
+                    'total' => $ratings->total(),
+                ]
+            ],
+            'meta' => [
+                'from' => $ratings->firstItem(),
+                'to' => $ratings->lastItem(),
+                'total' => $ratings->total(),
+            ]
+        ]);
     }
 }

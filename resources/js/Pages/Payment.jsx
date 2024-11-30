@@ -11,9 +11,34 @@ import LinkajaImg from "../../assets/linkaja.svg";
 import PaymentFrame from "../../assets/Frame 1000007093 (3).png";
 import Footer from "../Components/Footer";
 import Navbar from "@/Components/Navbar";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { usePage } from "@inertiajs/react";
 
 const Payment = () => {
+    const { product, quantity } = usePage().props;
+
+    console.log("Payment Page Props:", usePage().props);
+
+    // Jika data belum ada, tampilkan loading
+    if (!product || !quantity) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
+                    <p className="mt-4">Loading...</p>
+                </div>
+            </div>
+        );
+    }
+
+    const productData = product.data.product;
+    const tenantData = product.data.tenant;
+
+    const basePrice = productData.price * quantity;
+    const deliveryFee = 10000;
+    const promoVoucher = 10000;
+    const totalPrice = basePrice + deliveryFee - promoVoucher;
+
     const [activeAccordion, setActiveAccordion] = useState(null);
     const [selectedPayment, setSelectedPayment] = useState(null);
     const [rememberDetails, setRememberDetails] = useState(false);
@@ -41,7 +66,7 @@ const Payment = () => {
                         <p className="text-[#173302]">Payment</p>
                     </span>
                     <h2 className="text-2xl my-6 text-[#173302] font-semibold">
-                        Vegetable Salad
+                        {productData.name}
                     </h2>
                 </div>
             </section>
@@ -84,19 +109,23 @@ const Payment = () => {
                             <h1 className="mb-4">Product Summary</h1>
                             <div className="flex justify-between items-center">
                                 <span className="flex items-center">
-                                    <img src={Rectangle46} alt="Product" />
+                                    <img
+                                        src={productData.photo_urls[0]}
+                                        alt={productData.name}
+                                        className="w-16 h-16 object-cover rounded"
+                                    />
                                     <span className="ml-2">
                                         <p className="text-xs text-gray-400">
-                                            Vegetables
+                                            {tenantData?.name}
                                         </p>
-                                        <p>Vegetable Salad</p>
+                                        <p>{productData.name}</p>
                                     </span>
                                 </span>
                                 <span>
                                     <p className="text-xs text-gray-400 text-end">
-                                        Total : x2
+                                        Total : x{quantity}
                                     </p>
-                                    <p>Rp 40.000</p>
+                                    <p>Rp {basePrice.toLocaleString()}</p>
                                 </span>
                             </div>
                         </div>
@@ -324,57 +353,40 @@ const Payment = () => {
                                     Price Detail
                                 </p>
                             </div>
-                            <div>
-                                <div className="rounded-lg mb-4 mt-4">
-                                    <span className="flex justify-between">
+                            <div className="py-4">
+                                <div className="space-y-4">
+                                    <div className="flex justify-between">
                                         <p className="text-gray-400">
-                                            Item Quantity (2pcs)
+                                            Item Quantity ({quantity}pcs)
                                         </p>
-                                        <p>Rp 40.000</p>
-                                    </span>
-                                    <span className="flex justify-between mt-4">
+                                        <p>Rp {basePrice.toLocaleString()}</p>
+                                    </div>
+                                    <div className="flex justify-between">
                                         <p className="text-gray-400">
                                             Delivery (Estimation)
                                         </p>
-                                        <p>Rp 10.000</p>
-                                    </span>
-                                    <span className="flex justify-between mt-4">
+                                        <p>Rp {deliveryFee.toLocaleString()}</p>
+                                    </div>
+                                    <div className="flex justify-between">
                                         <p className="text-gray-400">
                                             Promo Voucher
                                         </p>
-                                        <p>Rp 10.000</p>
-                                    </span>
+                                        <p>
+                                            Rp {promoVoucher.toLocaleString()}
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
-                            {/* Total and proceed button */}
-                            <div>
-                                <span className="flex justify-between mt-4">
+                            <div className="pt-4">
+                                <div className="flex justify-between items-baseline">
                                     <p>Total</p>
-                                    <span className="flex items-baseline">
-                                        <span className="relative text-sm">
-                                            <p className="text-red-400">
-                                                Rp 50.000
-                                            </p>
-                                            <div className="absolute border-b border-red-500 w-full top-1/2"></div>
-                                        </span>
-                                        <p className="text-sm mr-2 text-slate-400 ml-2">
-                                            Rp
-                                        </p>
-                                        <p className="text-xl font-semibold">
-                                            40.000
-                                        </p>
-                                    </span>
-                                </span>
-                                <img
-                                    src={PaymentFrame}
-                                    className="mt-4"
-                                    alt="Payment Frame"
-                                />
-                                <a href="/cart">
-                                    <button className="bg-[#A1E870] rounded-lg px-5 py-3 w-full mt-4">
-                                        Proceed
-                                    </button>
-                                </a>
+                                    <p className="text-xl font-semibold">
+                                        Rp {totalPrice.toLocaleString()}
+                                    </p>
+                                </div>
+                                <button className="bg-[#A1E870] rounded-lg px-5 py-3 w-full mt-4">
+                                    Proceed
+                                </button>
                             </div>
                         </div>
                     </div>

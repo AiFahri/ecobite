@@ -2,9 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-use Faker\Provider\ar_EG\Address;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -15,21 +12,25 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
+            // Master Data
             TenantTypesSeeder::class,
             ProductTypesSeeder::class,
+            
+            // Core Data
             TenantsSeeder::class,
             ProductsSeeder::class,
             ProductMediaSeeder::class,
-            VouchersSeeder::class,
+            
+            // User Related
             UsersSeeder::class,
-            UsersVouchersSeeder::class,
-            TenantTypesSeeder::class,
-            ProductTypesSeeder::class,
-            TenantsSeeder::class,
-            ProductsSeeder::class,
-            ProductMediaSeeder::class,
-            WishlistsSeeder::class,
             AddressesSeeder::class,
+            
+            // Features
+            VouchersSeeder::class,
+            UsersVouchersSeeder::class,
+            WishlistsSeeder::class,
+            
+            // Transactions
             TransactionSeeder::class,
         ]);
     }
