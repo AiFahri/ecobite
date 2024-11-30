@@ -9,12 +9,15 @@ use App\Models\ProductType;
 use App\Http\Resources\ProductResource;
 use App\Http\Resources\ReviewResource;
 use Illuminate\Support\Facades\DB;
+use Inertia\Inertia;
 
 class CatalogController extends Controller
 {
     public function index()
     {
-        $products = Product::with(['productMedia', 'tenant'])->withAvg('ratings', 'star')->paginate(18);
+        $products = Product::with(['productMedia', 'tenant'])
+            ->withAvg('ratings', 'star')
+            ->paginate(12);
 
         $productTypes = ProductType::withCount('products')
             ->orderBy('products_count', 'DESC')
@@ -34,27 +37,33 @@ class CatalogController extends Controller
             ->groupBy('ti.product_id');
 
         $starCount = DB::table(DB::raw("({$subquery->toSql()}) as grouped_ratings"))
-            ->mergeBindings($subquery) // Pastikan parameter dari subquery terhubung
+            ->mergeBindings($subquery)
             ->selectRaw('rating_group, COUNT(*) as total_products')
             ->groupBy('rating_group')
             ->orderBy('rating_group', 'DESC')
             ->get();
 
         // Return data
-        CatalogResource::collection($products);
-        return response()->json(['products' => $products, 'product_types' => $productTypes, 'tenant_types' => $tenantTypes, 'star_count' => $starCount]);
+        // CatalogResource::collection($products);
+
         // return ['key' => ProductResource::collection($products)->response()->getData(true)];
+        return Inertia::render('Catalog', [
+            'products' => $products,
+            'productTypes' => $productTypes,
+            'tenantTypes' => $tenantTypes,
+            'starCount' => $starCount,
+            'filters' => request()->only(['search', 'type', 'rating'])
+        ]);
     }
 
     public function show($productID)
     {
-
         $product = Product::with(['tenant', 'productMedia'])->findOrFail($productID);
 
         // Paginate ratings
         $ratings = $product->ratings()
             ->with(['transactionItem.transaction.address.user'])
-            ->paginate(5); // 5 items per page
+            ->paginate(5);
 
         $similar_products = Product::with('productType')
             ->select('products.*')
@@ -71,11 +80,22 @@ class CatalogController extends Controller
 
         ReviewResource::collection($ratings);
 
-        // Gabungkan ratings yang dipaginate ke dalam response
-        return response()->json([
+        return Inertia::render('ProductDetail', [
             'product' => new ProductResource($product),
-            'reviews' => $ratings,
-            'similar_products' => CatalogResource::collection($similar_products),
+            'reviews' => [
+                'data' => $ratings->items(),
+                'links' => $ratings->links(),
+                'meta' => [
+                    'from' => $ratings->firstItem(),
+                    'to' => $ratings->lastItem(),
+                    'total' => $ratings->total(),
+                ]
+            ],
+            'meta' => [
+                'from' => $ratings->firstItem(),
+                'to' => $ratings->lastItem(),
+                'total' => $ratings->total(),
+            ]
         ]);
     }
 }

@@ -34,8 +34,11 @@ class ProductResource extends JsonResource
             'tenant' => [
                 'id' => $this->tenant->id,
                 'name' => $this->tenant->name,
+                'city' => $this->tenant->city,
+                'state' => $this->tenant->state,
                 'is_verified' => $this->tenant->is_verified,
                 'photo_url' => $this->tenant->photo_url,
+
             ],
         ];
     }
