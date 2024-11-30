@@ -370,9 +370,11 @@ const Payment = () => {
                                     className="mt-4"
                                     alt="Payment Frame"
                                 />
-                                <button className="bg-[#A1E870] rounded-lg px-5 py-3 w-full mt-4">
-                                    Proceed
-                                </button>
+                                <a href="/cart">
+                                    <button className="bg-[#A1E870] rounded-lg px-5 py-3 w-full mt-4">
+                                        Proceed
+                                    </button>
+                                </a>
                             </div>
                         </div>
                     </div>

@@ -27,6 +27,10 @@ Route::get('/productdetail', function () {
 Route::get('/products', [CatalogController::class, 'index'])->name('products.index');
 Route::get('/payment', function () {
     return Inertia::render('Payment');
+}); 
+
+Route::get('/cart', function () {
+    return Inertia::render('Cart');
 });
 
 Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('login.post');

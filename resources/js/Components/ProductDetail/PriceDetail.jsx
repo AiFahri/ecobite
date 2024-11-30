@@ -111,12 +111,12 @@ const PriceDetail = () => {
                     </span>
                 </span>
                 <span className="mt-4 grid grid-cols-2 gap-6">
-                    <a href="/pembayaran" className="col-span-1 block">
+                    <a href="/payment" className="col-span-1 block">
                         <button className="bg-[#A1E870] rounded-lg px-5 py-3 w-full">
                             Buy Now
                         </button>
                     </a>
-                    <a href="/transaction" className="col-span-1 block">
+                    <a href="/cart" className="col-span-1 block">
                         <button className="border border-[#A1E870] rounded-lg px-5 py-3 w-full">
                             Add to Chart
                         </button>
