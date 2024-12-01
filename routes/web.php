@@ -24,6 +24,10 @@ Route::get('/productdetail', function () {
     return Inertia::render('ProductDetail');
 });
 
+Route::get('/wishlist', function () {
+    return Inertia::render('Wishlist');
+});
+
 Route::get('/products', [CatalogController::class, 'index'])->name('products.index');
 Route::get('/payment', [PaymentController::class, 'index'])->name('payment.index');
 

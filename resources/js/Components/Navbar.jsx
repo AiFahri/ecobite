@@ -17,7 +17,7 @@ const Navbar = () => {
                             <a href="/catalog">Catalog</a>
                         </li>
                         <li className="mr-14 text-slate-500 hover:text-slate-900 hover:underline hover:underline-offset-2">
-                            <a href="/whislist">Whislist</a>
+                            <a href="/wishlist">Wishlist</a>
                         </li>
                         <li className="text-slate-500 hover:text-slate-900 hover:underline hover:underline-offset-2">
                             <a href="/transaction">Transaction</a>

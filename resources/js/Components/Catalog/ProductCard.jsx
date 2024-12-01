@@ -1,11 +1,15 @@
 import { Link } from "@inertiajs/react";
 import React from "react";
 import BookmarkIcon from "../../../assets/solar_bookmark-linear.svg";
+import BookmarkFilledIcon from "../../../assets/solar_bookmark-bold.svg";
 import StorefrontIcon from "../../../assets/storefront.svg";
 import ShieldIcon from "../../../assets/iconamoon_shield-yes-fill.svg";
-import ReviewsStatusIcon from "../../../assets/Reviews + Status.svg";
 
-const ProductCard = ({ product }) => {
+const ProductCard = ({ product, isWishlist = false }) => {
+    const formatPrice = (price) => {
+        return price?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    };
+
     return (
         <div className="border border-slate-400 flex flex-col p-4 rounded-lg">
             <Link href={`/products/${product.id}`}>
@@ -27,11 +31,23 @@ const ProductCard = ({ product }) => {
                     />
                 </span>
                 <span className="flex justify-between items-center mt-4">
-                    <p className="font-semibold text-xl">{product.name}</p>
+                    <p
+                        className={`font-semibold text-xl ${
+                            isWishlist ? "text-[#173302]" : ""
+                        }`}
+                    >
+                        {product.name}
+                    </p>
                     <img
-                        src={BookmarkIcon}
+                        src={isWishlist ? BookmarkFilledIcon : BookmarkIcon}
                         className="w-5 h-6"
                         alt="Bookmark"
+                        style={{
+                            filter: isWishlist
+                                ? "none"
+                                : "brightness(0) saturate(100%)",
+                            fill: isWishlist ? "#173302" : "none",
+                        }}
                     />
                 </span>
                 <span className="flex items-center mt-2">
@@ -54,9 +70,11 @@ const ProductCard = ({ product }) => {
                         {[...Array(5)].map((_, i) => (
                             <span
                                 key={i}
-                                className={`text-${
-                                    i < product.rating ? "yellow" : "gray"
-                                }-400`}
+                                className={`text-2xl ${
+                                    i < product.rating
+                                        ? "text-orange-400"
+                                        : "text-gray-300"
+                                }`}
                             >
                                 ★
                             </span>
@@ -65,15 +83,25 @@ const ProductCard = ({ product }) => {
                 )}
                 <span className="flex items-center mb-2">
                     <span className="flex items-baseline">
-                        <p className="text-xs mr-2">Rp</p>
-                        <p className="text-xl font-bold mr-3">
-                            {product.price}
+                        <p
+                            className={`text-xs mr-2 ${
+                                isWishlist ? "text-[#173302]" : ""
+                            }`}
+                        >
+                            Rp
+                        </p>
+                        <p
+                            className={`text-xl font-bold mr-3 ${
+                                isWishlist ? "text-[#173302]" : ""
+                            }`}
+                        >
+                            {formatPrice(product.price)}
                         </p>
                     </span>
                     {product.oldPrice && (
                         <span className="relative">
                             <p className="text-md text-red-500">
-                                Rp {product.oldPrice}
+                                Rp {formatPrice(product.oldPrice)}
                             </p>
                             <div className="absolute top-1/2 border border-black w-full"></div>
                         </span>
