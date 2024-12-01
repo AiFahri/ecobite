@@ -11,6 +11,12 @@ class Product extends Model
     use HasUlids;
     protected $table = 'products';
 
+    protected $fillable = [
+        'name',
+        'price',
+        'quantity',
+    ];
+
     public function transactionItems()
     {
         return $this->hasMany(TransactionItem::class, 'product_id');
