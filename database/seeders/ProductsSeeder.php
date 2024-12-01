@@ -24,9 +24,9 @@ class ProductsSeeder extends Seeder
             DB::table('products')->insert([
                 'id' => (string) \Illuminate\Support\Str::ulid(),
                 'name' => $faker->foodName(),
-                'description' => $faker->text(50),
-                'price' => $price = $faker->numberBetween(10000, 100000),
-                'discount_price' => $faker->numberBetween(10000, $price),
+                'description' => $faker->paragraph() . ' '  . $faker->paragraph() . ' ' . $faker->paragraph() . ' ' . $faker->paragraph() . ' ' . $faker->paragraph(),
+                'price' => $price = $faker->numberBetween(300, 999) * 100,
+                'discount_price' => $faker->numberBetween(100, $price / 100) * 100,
                 'stock' => $faker->numberBetween(5, 20),
                 'created_at' => now(),
                 'updated_at' => now(),

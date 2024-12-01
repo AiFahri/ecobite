@@ -12,6 +12,7 @@
         "laravel/sanctum": "^4.0",
         "laravel/socialite": "^5.16",
         "laravel/tinker": "^2.9",
+        "league/csv": "^9.18",
         "midtrans/midtrans-php": "^2.6",
         "symfony/uid": "^7.1",
         "tightenco/ziggy": "^2.0"

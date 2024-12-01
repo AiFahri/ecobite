@@ -26,6 +26,7 @@ class ProductMediaSeeder extends Seeder
                 'updated_at' => now(),
                 'product_id' => $product,
             ]);
+
             DB::table('product_media')->insert([
                 'id' => (string) \Illuminate\Support\Str::ulid(),
                 'photo_url' => $faker->imageUrl(),

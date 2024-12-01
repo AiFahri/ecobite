@@ -19,4 +19,9 @@ class Tenant extends Model
     {
         return $this->id;
     }
+
+    public function tenantType()
+    {
+        return $this->belongsTo(TenantType::class, 'tenant_type_id'); // Foreign key di tabel tenant
+    }
 }

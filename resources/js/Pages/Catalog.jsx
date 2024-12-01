@@ -192,7 +192,7 @@ const Catalog = () => {
                                                                 ?.is_verified ||
                                                             false,
                                                         rating:
-                                                            product.ratings_avg_star ||
+                                                            Math.floor(product.ratings_avg_star) ||
                                                             0,
                                                     }}
                                                     isWishlist={wishlists.includes(
