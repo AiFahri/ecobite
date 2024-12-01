@@ -14,6 +14,7 @@ const SearchBar = ({
     placeholder = "Cari...",
     className = "",
     currentPath = "/catalog",
+    showIcons = true,
 }) => {
     const inputRef = useRef(null);
 
@@ -43,12 +44,14 @@ const SearchBar = ({
 
     return (
         <div className="flex items-center">
-            <div
-                className="py-4 px-4 inline-block border border-slate-400 rounded-lg mr-4 cursor-pointer hover:bg-gray-50"
-                onClick={handleRefresh}
-            >
-                <img src={RefreshIcon} alt="Refresh" />
-            </div>
+            {showIcons && (
+                <div
+                    className="py-4 px-4 inline-block border border-slate-400 rounded-lg mr-4 cursor-pointer hover:bg-gray-50"
+                    onClick={handleRefresh}
+                >
+                    <img src={RefreshIcon} alt="Refresh" />
+                </div>
+            )}
 
             <div
                 className={`flex border border-slate-400 rounded-lg py-4 px-4 flex-1 ${className}`}
@@ -85,14 +88,20 @@ const SearchBar = ({
                 </div>
             </div>
 
-            <span className="flex items-center justify-center border border-slate-400 py-4 px-4 rounded-lg box-border ml-0">
-                <img src={WindowIcon} className="w-5 h-5 mr-2" alt="Window" />
-                <img
-                    src={GridIcon}
-                    className="bg-slate-200 rounded-lg w-6 h-6 p-[2px]"
-                    alt="Grid"
-                />
-            </span>
+            {showIcons && (
+                <span className="flex items-center justify-center border border-slate-400 py-4 px-4 rounded-lg box-border ml-4">
+                    <img
+                        src={WindowIcon}
+                        className="w-5 h-5 mr-2"
+                        alt="Window"
+                    />
+                    <img
+                        src={GridIcon}
+                        className="bg-slate-200 rounded-lg w-6 h-6 p-[2px]"
+                        alt="Grid"
+                    />
+                </span>
+            )}
         </div>
     );
 };

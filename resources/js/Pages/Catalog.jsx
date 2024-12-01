@@ -134,9 +134,9 @@ const Catalog = () => {
                             </div>
 
                             <div className="col-span-3">
-                                <div className="grid grid-cols-3 gap-6 mt-10">
-                                    {filteredProducts.map((product) => {
-                                        return (
+                                {filteredProducts.length > 0 ? (
+                                    <div className="grid grid-cols-3 gap-6 mt-10">
+                                        {filteredProducts.map((product) => (
                                             <ProductCard
                                                 key={product.id}
                                                 product={{
@@ -165,9 +165,18 @@ const Catalog = () => {
                                                     rating: product.ratings_avg_star,
                                                 }}
                                             />
-                                        );
-                                    })}
-                                </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="flex flex-col items-center justify-center mt-10 py-20">
+                                        <p className="text-2xl font-semibold text-gray-600">
+                                            No products found
+                                        </p>
+                                        <p className="text-gray-400 mt-2">
+                                            Try searching with other keywords
+                                        </p>
+                                    </div>
+                                )}
 
                                 <div className="mt-8">
                                     <div className="flex justify-between items-center">
