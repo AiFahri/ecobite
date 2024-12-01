@@ -9,6 +9,9 @@ use App\Models\Address;
 use App\Models\Product;
 use App\Models\UserVoucher;
 use Illuminate\Support\Facades\Session;
+use League\Geotools\Coordinate\Coordinate;
+use League\Geotools\Distance\Distance;
+use League\Geotools\Distance\Vincenty;
 
 class TransactionController extends Controller
 {
@@ -17,24 +20,21 @@ class TransactionController extends Controller
     public function showInstantBuy()
     {
 
-        $addresses = Address::where('user_id', Auth::id())
-            ->orderByDesc('is_primary')
-            ->get();
-
-        // Proses setiap produk dari session
-        $products = [];
-        foreach (Session::get('instant-buy')['products'] as $item) {
-            $product = Product::with(['productType', 'productMedia'])
-                ->where('id', $item['product_id'])
+        if (!data_get(Session::get('instant-buy'), 'address_id')) {
+            $address = Address::where('user_id', Auth::id())
+                ->orderByDesc('is_primary')
                 ->first();
-
-            if ($product) {
-                // Tambahkan quantity ke produk
-                $product->quantity = $item['quantity'] ?? 1; // Default quantity = 1 jika tidak ada
-                $products[] = $product;
-            }
+        } else {
+            // Ambil address_id dari session dan cari Address-nya di database
+            $addressId = data_get(Session::get('instant-buy'), 'address_id');
+            $address = Address::find($addressId); // Mengembalikan object Address
         }
 
+        $product = Product::with(['tenant', 'productType', 'productMedia'])
+            ->where('id', Session::get('instant-buy')['product_id'])
+            ->first();
+
+        $product->quantity = Session::get('instant-buy')['quantity'];
 
         $voucherId = Session::get('instant-buy')['voucher_id'] ?? null;
 
@@ -46,12 +46,45 @@ class TransactionController extends Controller
             ->get()
             : null;
 
+        $dist = round($this->haversine($product->tenant->latitude, $product->tenant->longitude, $address->latitude, $address->longitude), 0);
+        $address->distance = $dist > 1000 ? round($dist / 1000, 2) : $dist;
+
+        $addresses = Address::where('user_id', Auth::id())
+            ->where('id', '!=', $address->id)
+            ->get();
+
         return response()->json([
+            'address' => $address,
             'addresses' => $addresses,
-            'products' => $products,
+            'product' => $product,
             'voucher' => $vouchers,
         ]);
     }
+
+    private function haversine($latitudeFrom, $longitudeFrom, $latitudeTo, $longitudeTo)
+    {
+        $earthRadius = 6371; // Radius bumi dalam kilometer
+
+        // Konversi derajat ke radian
+        $latFrom = deg2rad($latitudeFrom);
+        $lonFrom = deg2rad($longitudeFrom);
+        $latTo = deg2rad($latitudeTo);
+        $lonTo = deg2rad($longitudeTo);
+
+        // Hitung delta latitude dan longitude
+        $latDelta = $latTo - $latFrom;
+        $lonDelta = $lonTo - $lonFrom;
+
+        // Formula haversine
+        $angle = 2 * asin(sqrt(pow(sin($latDelta / 2), 2) +
+            cos($latFrom) * cos($latTo) * pow(sin($lonDelta / 2), 2)));
+
+        $distanceInKilometers = $earthRadius * $angle;
+
+        // Ubah ke meter
+        return $distanceInKilometers * 1000; // Hasil dalam meter
+    }
+
 
     public function storeInstantBuy(InstantBuyRequest $request)
     {
