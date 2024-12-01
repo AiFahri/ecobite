@@ -24,6 +24,7 @@ import Navbar from "@/Components/Navbar";
 import ProductFilter from "@/Components/Catalog/ProductFilter";
 import Footer from "@/Components/Footer";
 import ProductCard from "@/Components/Catalog/ProductCard";
+import SearchBar from "@/Components/Catalog/SearchBar";
 
 const Catalog = () => {
     const {
@@ -37,6 +38,9 @@ const Catalog = () => {
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedType, setSelectedType] = useState("");
     const [selectedRating, setSelectedRating] = useState("");
+    const [filteredProducts, setFilteredProducts] = useState(
+        products?.data || []
+    );
 
     useEffect(() => {
         if (filters) {
@@ -45,6 +49,21 @@ const Catalog = () => {
             setSelectedRating(filters.rating || "");
         }
     }, [filters]);
+
+    useEffect(() => {
+        // Filter products berdasarkan searchQuery (nama produk atau nama tenant)
+        if (searchQuery.trim() === "") {
+            setFilteredProducts(products?.data || []);
+        } else {
+            const searchTerm = searchQuery.toLowerCase();
+            const filtered = products?.data?.filter(
+                (product) =>
+                    product.name.toLowerCase().includes(searchTerm) ||
+                    product.tenant?.name?.toLowerCase().includes(searchTerm)
+            );
+            setFilteredProducts(filtered || []);
+        }
+    }, [searchQuery, products?.data]);
 
     const handleSearch = (e) => {
         setSearchQuery(e.target.value);
@@ -81,48 +100,14 @@ const Catalog = () => {
                         <h2 className="text-2xl my-6 font-semibold text-[#173302]">
                             Catalog Page
                         </h2>
-                        <div className="flex items-center">
-                            <div className="py-[10px] px-3 inline-block border border-slate-400 rounded-lg mr-4">
-                                <img src={RefreshIcon} alt="Refresh" />
-                            </div>
-                            <div className="flex border border-slate-400 w-full rounded-lg p-2 mr-12">
-                                <input
-                                    type="text"
-                                    className="w-full outline-none"
-                                />
-                                <div className="flex">
-                                    <div className="py-1 px-2 bg-[#F0F0F0] flex items-center justify-center rounded-lg mr-2">
-                                        <img
-                                            src={CommandIcon}
-                                            className="w-3 h-3 flex items-center justify-center"
-                                            alt="Command"
-                                        />
-                                    </div>
-                                    <div className="py-1 px-2 bg-[#F0F0F0] flex items-center justify-center rounded-lg">
-                                        <img
-                                            src={KIcon}
-                                            className="w-3 h-3 flex items-center justify-center"
-                                            alt="K"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                            <span className="border border-slate-400 py-2 px-4 rounded-lg mr-4">
-                                <p>Relevant</p>
-                            </span>
-                            <span className="flex items-center justify-center border border-slate-400 py-2 px-3 rounded-lg box-border">
-                                <img
-                                    src={WindowIcon}
-                                    className="w-5 h-5 mr-2"
-                                    alt="Window"
-                                />
-                                <img
-                                    src={GridIcon}
-                                    className="bg-slate-200 rounded-lg w-6 h-6 p-[2px]"
-                                    alt="Grid"
-                                />
-                            </span>
-                        </div>
+                        <SearchBar
+                            value={searchQuery}
+                            onChange={handleSearch}
+                            onEnter={handleFilter}
+                            placeholder="Find something here..."
+                            className="w-full mr-12"
+                            currentPath="/catalog"
+                        />
                     </div>
                 </section>
                 <section className="hero-7">
@@ -150,8 +135,7 @@ const Catalog = () => {
 
                             <div className="col-span-3">
                                 <div className="grid grid-cols-3 gap-6 mt-10">
-                                    {products?.data?.map((product) => {
-                                        console.log("Product Data:", product);
+                                    {filteredProducts.map((product) => {
                                         return (
                                             <ProductCard
                                                 key={product.id}

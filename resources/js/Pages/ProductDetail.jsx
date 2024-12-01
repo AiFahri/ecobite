@@ -1,10 +1,11 @@
-import React from "react";
-import { usePage } from "@inertiajs/react";
+import React, { useState } from "react";
+import { usePage, router } from "@inertiajs/react";
 import Navbar from "@/Components/Navbar";
 import Footer from "@/Components/Footer";
 import ProductCard from "@/Components/Catalog/ProductCard";
 import PriceDetail from "@/Components/ProductDetail/PriceDetail";
 import ReviewItem from "@/Components/ProductDetail/ReviewItem";
+import SearchBar from "@/Components/Catalog/SearchBar";
 
 // Import gambar
 import RefreshIcon from "../../assets/material-symbols_refresh.svg";
@@ -20,6 +21,7 @@ const ProductDetail = () => {
     const { product, reviews, meta } = usePage().props;
     const productData = product?.data?.product;
     const tenantData = product?.data?.tenant;
+    const [searchQuery, setSearchQuery] = useState("");
 
     if (!productData) {
         return <div>Loading...</div>;
@@ -27,6 +29,17 @@ const ProductDetail = () => {
     console.log(productData);
     const mainPhoto = productData?.photo_urls?.[0] || "";
     const additionalPhotos = productData?.photo_urls?.slice(1) || [];
+
+    const handleSearch = (e) => {
+        setSearchQuery(e.target.value);
+    };
+
+    const handleFilter = () => {
+        // Redirect ke catalog dengan query search
+        router.get("/catalog", {
+            search: searchQuery,
+        });
+    };
 
     return (
         <div className="overflow-y-scroll no-scrollbar">
@@ -43,11 +56,21 @@ const ProductDetail = () => {
                     <h2 className="text-2xl my-6 font-semibold text-[#173302]">
                         {productData.name}
                     </h2>
+                    <div className="max-w-screen-xl">
+                        <SearchBar
+                            value={searchQuery}
+                            onChange={handleSearch}
+                            onEnter={handleFilter}
+                            placeholder="Find something here..."
+                            className="w-full mr-12"
+                            currentPath="/catalog"
+                        />
+                    </div>
                 </div>
             </section>
 
             {/* Main Content */}
-            <div className="container mx-auto max-w-screen-xl font-outfit">
+            <div className="container mx-auto max-w-screen-xl font-outfit mt-6">
                 <div className="grid grid-cols-3 gap-6 mt-10">
                     <div
                         className="col-span-2 w-full h-[300px] bg-no-repeat bg-cover overflow-hidden rounded-sm bg-center"
