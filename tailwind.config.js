@@ -12,6 +12,10 @@ export default {
 
     theme: {
         extend: {
+            colors: {
+                primary: "#173302",
+                secondary: "#8E8E8E",
+            },
             fontFamily: {
                 sans: ["Outfit", ...defaultTheme.fontFamily.sans],
                 outfit: ["Outfit", "sans-serif"],

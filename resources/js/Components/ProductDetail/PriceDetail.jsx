@@ -19,9 +19,9 @@ const PriceDetail = ({ product }) => {
     const totalPrice = basePrice + deliveryFee - promoVoucher;
 
     const handleBuyNow = () => {
-        router.visit(`/payment?product_id=${product.id}&quantity=${quantity}`, {
-            preserveState: true,
-            preserveScroll: true,
+        router.post("/instant-buy", {
+            product_id: product.id,
+            quantity: quantity,
         });
     };
 
@@ -34,7 +34,9 @@ const PriceDetail = ({ product }) => {
 
     return (
         <div className="border border-slate-200 rounded-lg p-6 space-y-6">
-            <h2 className="font-semibold text-lg">Price Detail</h2>
+            <div className="pb-4 border-b">
+                <h2 className="font-semibold text-lg">Price Detail</h2>
+            </div>
 
             {/* Quantity Section */}
             <div>
@@ -59,8 +61,8 @@ const PriceDetail = ({ product }) => {
                     </div>
                     <span className="text-gray-500">
                         Stock Total:{" "}
-                        <span className="font-bold text-black">
-                            {product.stocks - quantity} pcs
+                        <span className="font-medium text-black">
+                            {product.stocks} pcs
                         </span>
                     </span>
                 </div>
@@ -104,13 +106,10 @@ const PriceDetail = ({ product }) => {
             {/* Total Detail */}
             <div className="space-y-3">
                 <h3 className="font-semibold">Total Detail</h3>
-                <div className="space-y-2">
+                <div className="space-y-2 bg-gray-50 p-4 rounded-lg">
                     <div className="flex justify-between">
                         <span className="text-gray-600">
-                            Item Quantity{" "}
-                            <span className="font-bold text-black">
-                                ({quantity}pcs)
-                            </span>
+                            Item Quantity ({quantity}pcs)
                         </span>
                         <span>Rp {basePrice.toLocaleString()}</span>
                     </div>
@@ -131,26 +130,24 @@ const PriceDetail = ({ product }) => {
             <div className="pt-4 border-t">
                 <div className="flex justify-between items-center mb-4">
                     <span className="font-semibold">Total</span>
-                    <span className="font-semibold text-lg">
-                        Rp {totalPrice.toLocaleString()}
-                    </span>
+                    <div className="text-right">
+                        {product.oldPrice && (
+                            <span className="text-red-500 line-through block text-sm">
+                                Rp {product.oldPrice.toLocaleString()}
+                            </span>
+                        )}
+                        <span className="font-semibold text-lg">
+                            Rp {totalPrice.toLocaleString()}
+                        </span>
+                    </div>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                    <button
-                        onClick={handleBuyNow}
-                        className="w-full py-3 bg-[#A1E870] rounded-lg font-semibold"
-                        disabled={quantity < 1 || product.stocks === 0}
-                    >
-                        Buy Now
-                    </button>
-                    <button
-                        onClick={handleAddToCart}
-                        className="w-full py-3 border border-[#A1E870] rounded-lg font-semibold"
-                        disabled={quantity < 1 || product.stocks === 0}
-                    >
-                        Add to Cart
-                    </button>
-                </div>
+                <button
+                    onClick={handleBuyNow}
+                    className="w-full py-3 bg-[#A1E870] rounded-lg font-semibold"
+                    disabled={quantity < 1 || product.stocks === 0}
+                >
+                    Buy Now
+                </button>
             </div>
         </div>
     );

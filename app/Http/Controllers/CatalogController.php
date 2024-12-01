@@ -10,11 +10,21 @@ use App\Http\Resources\ProductResource;
 use App\Http\Resources\ReviewResource;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
+use App\Models\Wishlist;
 
 class CatalogController extends Controller
 {
     public function index()
     {
+        $user = auth()->user();
+        $wishlists = [];
+        
+        if ($user) {
+            $wishlists = Wishlist::where('user_id', $user->id)
+                ->pluck('product_id')
+                ->toArray();
+        }
+
         $products = Product::with(['productMedia', 'tenant'])
             ->withAvg('ratings', 'star')
             ->paginate(12);
@@ -43,12 +53,9 @@ class CatalogController extends Controller
             ->orderBy('rating_group', 'DESC')
             ->get();
 
-        // Return data
-        // CatalogResource::collection($products);
-
-        // return ['key' => ProductResource::collection($products)->response()->getData(true)];
         return Inertia::render('Catalog', [
             'products' => $products,
+            'wishlists' => $wishlists,
             'productTypes' => $productTypes,
             'tenantTypes' => $tenantTypes,
             'starCount' => $starCount,

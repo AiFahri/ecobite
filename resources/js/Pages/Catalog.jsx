@@ -33,6 +33,7 @@ const Catalog = () => {
         tenantTypes,
         starCount,
         filters = {},
+        wishlists = [],
     } = usePage().props;
 
     const [searchQuery, setSearchQuery] = useState("");
@@ -84,6 +85,25 @@ const Catalog = () => {
         );
     };
 
+    const handleToggleWishlist = (productId) => {
+        router.post(
+            "/wishlist/toggle",
+            {
+                product_id: productId,
+            },
+            {
+                preserveScroll: true,
+                preserveState: true,
+                onSuccess: () => {
+                    console.log("Toggle wishlist success");
+                },
+                onError: (errors) => {
+                    console.error("Toggle wishlist error:", errors);
+                },
+            }
+        );
+    };
+
     return (
         <>
             <div className="overflow-y-scroll no-scrollbar">
@@ -110,7 +130,7 @@ const Catalog = () => {
                         />
                     </div>
                 </section>
-                <section className="hero-7">
+                <section className="mt-10">
                     <div className="container max-w-screen-xl mx-auto font-outfit">
                         <div className="grid grid-cols-4 gap-6 mb-20">
                             <div className="row-span-full">
@@ -135,37 +155,57 @@ const Catalog = () => {
 
                             <div className="col-span-3">
                                 {filteredProducts.length > 0 ? (
-                                    <div className="grid grid-cols-3 gap-6 mt-10">
-                                        {filteredProducts.map((product) => (
-                                            <ProductCard
-                                                key={product.id}
-                                                product={{
-                                                    id: product.id,
-                                                    image:
-                                                        Array.isArray(
-                                                            product.product_media
-                                                        ) &&
-                                                        product.product_media
-                                                            .length > 0
-                                                            ? product
-                                                                  .product_media[0]
-                                                                  .photo_url
-                                                            : DiscountImage,
-                                                    name: product.name,
-                                                    store:
-                                                        product.tenant?.name ||
-                                                        "Unknown Store",
-                                                    price: product.price,
-                                                    oldPrice:
-                                                        product.original_price,
-                                                    verified:
-                                                        product.tenant
-                                                            ?.is_verified ||
-                                                        false,
-                                                    rating: product.ratings_avg_star,
-                                                }}
-                                            />
-                                        ))}
+                                    <div className="grid grid-cols-3 gap-6 mt-0">
+                                        {filteredProducts.map((product) => {
+                                            console.log("Product data:", {
+                                                id: product.id,
+                                                ratings:
+                                                    product.ratings_avg_star,
+                                                // ... other data
+                                            });
+                                            return (
+                                                <ProductCard
+                                                    key={product.id}
+                                                    product={{
+                                                        id: product.id,
+                                                        image:
+                                                            Array.isArray(
+                                                                product.product_media
+                                                            ) &&
+                                                            product
+                                                                .product_media
+                                                                .length > 0
+                                                                ? product
+                                                                      .product_media[0]
+                                                                      .photo_url
+                                                                : DiscountImage,
+                                                        name: product.name,
+                                                        store:
+                                                            product.tenant
+                                                                ?.name ||
+                                                            "Unknown Store",
+                                                        price: product.price,
+                                                        oldPrice:
+                                                            product.original_price,
+                                                        verified:
+                                                            product.tenant
+                                                                ?.is_verified ||
+                                                            false,
+                                                        rating:
+                                                            product.ratings_avg_star ||
+                                                            0,
+                                                    }}
+                                                    isWishlist={wishlists.includes(
+                                                        product.id.toString()
+                                                    )}
+                                                    onToggleWishlist={() =>
+                                                        handleToggleWishlist(
+                                                            product.id
+                                                        )
+                                                    }
+                                                />
+                                            );
+                                        })}
                                     </div>
                                 ) : (
                                     <div className="flex flex-col items-center justify-center mt-10 py-20">

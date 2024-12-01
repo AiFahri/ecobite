@@ -16,7 +16,10 @@ import { usePage, router } from "@inertiajs/react";
 
 const Payment = () => {
     const { product, quantity, delivery_fee, promo_voucher } = usePage().props;
-    const [selectedAddress, setSelectedAddress] = useState(null);
+    const [selectedAddress, setSelectedAddress] = useState({
+        id: "test-address-id",
+        address: "Jl. Yos Sudarso, Kec. Dringu, Probolinggo, Jawa",
+    });
 
     console.log("Payment Page Props:", usePage().props);
 
@@ -42,17 +45,17 @@ const Payment = () => {
         }
 
         router.post(
-            "/process-payment",
+            "/payment",
             {
                 product_id: product.id,
-                quantity: quantity,
+                quantity: product.quantity,
                 address_id: selectedAddress.id,
+                voucher_id: voucher ? voucher[0]?.id : null,
             },
             {
                 preserveScroll: true,
                 onSuccess: (response) => {
-                    // Handle Midtrans
-                    window.snap.pay(response.snap_token, {
+                    window.snap.pay(response.data.snap_token, {
                         onSuccess: function (result) {
                             console.log("Payment success:", result);
                             router.visit("/dashboard");

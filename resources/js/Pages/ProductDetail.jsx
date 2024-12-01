@@ -6,22 +6,33 @@ import ProductCard from "@/Components/Catalog/ProductCard";
 import PriceDetail from "@/Components/ProductDetail/PriceDetail";
 import ReviewItem from "@/Components/ProductDetail/ReviewItem";
 import SearchBar from "@/Components/Catalog/SearchBar";
+import SimilarSection from "@/Components/ProductDetail/SimilarSection";
 
 // Import gambar
 import RefreshIcon from "../../assets/material-symbols_refresh.svg";
 import WindowIcon from "../../assets/material-symbols_window.svg";
 import GridIcon from "../../assets/uis_window-grid.svg";
 import EllipseIcon from "../../assets/Ellipse 440.svg";
+import PromoImage from "../../assets/promo2.png";
+
 import VectorIcon from "../../assets/Vector.svg";
 import GroupIcon from "../../assets/Group.svg";
 import OutlineGppIcon from "../../assets/ic_outline-gpp-good.svg";
 import ChatIcon from "../../assets/solar_chat-square-like-outline.svg";
+import BookmarkIcon from "../../assets/solar_bookmark-linear.svg";
+import BookmarkFilledIcon from "../../assets/solar_bookmark-bold.svg";
+// import BookmarkIcon from "../../assets/solar_bookmark-linear.svg";
+// import BookmarkFilledIcon from "../../assets/solar_bookmark-filled.svg"; // Tambahkan icon untuk wishlist aktif
+import ShareIcon from "../../assets/share.svg"; // Tambahkan icon share
 
 const ProductDetail = () => {
     const { product, reviews, meta } = usePage().props;
     const productData = product?.data?.product;
     const tenantData = product?.data?.tenant;
     const [searchQuery, setSearchQuery] = useState("");
+    const [isWishlisted, setIsWishlisted] = useState(
+        productData?.is_wishlisted || false
+    );
 
     if (!productData) {
         return <div>Loading...</div>;
@@ -41,6 +52,40 @@ const ProductDetail = () => {
         });
     };
 
+    const handleToggleWishlist = () => {
+        router.post(
+            "/wishlist/toggle",
+            {
+                product_id: productData.id,
+            },
+            {
+                preserveScroll: true,
+                preserveState: true,
+                onSuccess: () => {
+                    setIsWishlisted(!isWishlisted);
+                },
+            }
+        );
+    };
+
+    const handleShare = async () => {
+        try {
+            if (navigator.share) {
+                await navigator.share({
+                    title: productData.name,
+                    text: productData.description,
+                    url: window.location.href,
+                });
+            } else {
+                // Fallback: Copy link to clipboard
+                await navigator.clipboard.writeText(window.location.href);
+                alert("Link copied to clipboard!");
+            }
+        } catch (error) {
+            console.error("Error sharing:", error);
+        }
+    };
+
     return (
         <div className="overflow-y-scroll no-scrollbar">
             <Navbar />
@@ -53,9 +98,40 @@ const ProductDetail = () => {
                         <p className="mx-2">/</p>
                         <p className="text-[#173302]">Product Detail</p>
                     </span>
-                    <h2 className="text-2xl my-6 font-semibold text-[#173302]">
-                        {productData.name}
-                    </h2>
+                    <div className="flex justify-between items-center">
+                        <h2 className="text-2xl my-6 font-semibold text-[#173302]">
+                            {productData.name}
+                        </h2>
+                        <div className="flex items-center gap-4">
+                            <button
+                                onClick={handleToggleWishlist}
+                                className="flex items-center gap-2 p-2 rounded-lg border border-gray-200 hover:bg-gray-50"
+                            >
+                                <img
+                                    src={
+                                        isWishlisted
+                                            ? BookmarkFilledIcon
+                                            : BookmarkIcon
+                                    }
+                                    alt="Save"
+                                    className="w-6 h-6"
+                                />
+                                <span className="text-gray-500">Save</span>
+                            </button>
+                            <div className="text-gray-300">|</div>
+                            <button
+                                onClick={handleShare}
+                                className="flex items-center gap-2 p-2 rounded-lg border border-gray-200 hover:bg-gray-50"
+                            >
+                                <img
+                                    src={ShareIcon}
+                                    alt="Share"
+                                    className="w-6 h-6"
+                                />
+                                <span className="text-gray-500">Share</span>
+                            </button>
+                        </div>
+                    </div>
                     <div className="max-w-screen-xl">
                         <SearchBar
                             value={searchQuery}
@@ -162,12 +238,14 @@ const ProductDetail = () => {
                         </div>
 
                         {reviews && meta && (
-                            <div className="divide-y divide-solid divide-slate-200 border border-slate-200 rounded-lg p-4 mt-16 mb-16">
-                                <div>
+                            <div className="border border-slate-200 rounded-lg p-4 mt-16 mb-16">
+                                <div className="mb-4">
                                     <div className="flex justify-between items-center">
                                         <span>
-                                            <p>Food Review</p>
-                                            <p>
+                                            <p className="font-semibold text-lg">
+                                                Food Review
+                                            </p>
+                                            <p className="text-gray-500 text-sm">
                                                 Showing {meta?.from} -{" "}
                                                 {meta?.to} Reviews From{" "}
                                                 {meta?.total} Results
@@ -178,13 +256,15 @@ const ProductDetail = () => {
                                         </button>
                                     </div>
                                 </div>
-                                {Array.isArray(reviews?.data) &&
-                                    reviews.data.map((review, index) => (
-                                        <ReviewItem
-                                            key={index}
-                                            review={review}
-                                        />
-                                    ))}
+                                <div className="divide-y divide-slate-200">
+                                    {Array.isArray(reviews?.data) &&
+                                        reviews.data.map((review, index) => (
+                                            <ReviewItem
+                                                key={index}
+                                                review={review}
+                                            />
+                                        ))}
+                                </div>
                             </div>
                         )}
                     </div>
@@ -196,9 +276,20 @@ const ProductDetail = () => {
                                 oldPrice: productData.discount_price || null,
                             }}
                         />
+                        <div className="rounded-lg mt-8 overflow-hidden">
+                            <img
+                                src={PromoImage}
+                                className="w-full aspect-[1.3/1]"
+                                alt="Special Promo For New User"
+                            />
+                        </div>
                     </div>
                 </div>
             </div>
+
+            <SimilarSection
+                similarProducts={product?.data?.similar_products || []}
+            />
 
             <Footer />
         </div>

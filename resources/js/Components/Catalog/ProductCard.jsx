@@ -4,14 +4,32 @@ import BookmarkIcon from "../../../assets/solar_bookmark-linear.svg";
 import BookmarkFilledIcon from "../../../assets/solar_bookmark-bold.svg";
 import StorefrontIcon from "../../../assets/storefront.svg";
 import ShieldIcon from "../../../assets/iconamoon_shield-yes-fill.svg";
+import { router } from "@inertiajs/react";
 
-const ProductCard = ({ product, isWishlist = false }) => {
+const ProductCard = ({ product, isWishlist = false, onToggleWishlist }) => {
     const formatPrice = (price) => {
         return price?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     };
 
+    const handleBookmarkClick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log("Bookmark clicked for product ID:", product.id);
+        if (onToggleWishlist) {
+            onToggleWishlist();
+        }
+    };
+
+    const handleBuyNow = (e) => {
+        e.preventDefault();
+        router.post("/instant-buy", {
+            product_id: product.id,
+            quantity: 1, // Default quantity 1
+        });
+    };
+
     return (
-        <div className="border border-slate-400 flex flex-col p-4 rounded-lg">
+        <div className="border border-slate-200 flex flex-col p-4 rounded-lg">
             <Link href={`/products/${product.id}`}>
                 <span className="relative">
                     {product.oldPrice && (
@@ -26,29 +44,30 @@ const ProductCard = ({ product, isWishlist = false }) => {
                     )}
                     <img
                         src={product.image}
-                        className="w-full"
+                        className="w-full aspect-square object-cover"
                         alt={product.name}
                     />
                 </span>
                 <span className="flex justify-between items-center mt-4">
-                    <p
-                        className={`font-semibold text-xl ${
-                            isWishlist ? "text-[#173302]" : ""
-                        }`}
-                    >
+                    <p className={`font-semibold text-xl text-primary`}>
                         {product.name}
                     </p>
-                    <img
-                        src={isWishlist ? BookmarkFilledIcon : BookmarkIcon}
-                        className="w-5 h-6"
-                        alt="Bookmark"
-                        style={{
-                            filter: isWishlist
-                                ? "none"
-                                : "brightness(0) saturate(100%)",
-                            fill: isWishlist ? "#173302" : "none",
-                        }}
-                    />
+                    <button
+                        onClick={handleBookmarkClick}
+                        className="focus:outline-none"
+                    >
+                        <img
+                            src={isWishlist ? BookmarkFilledIcon : BookmarkIcon}
+                            className="w-5 h-6"
+                            alt="Bookmark"
+                            style={{
+                                filter: isWishlist
+                                    ? "none"
+                                    : "brightness(0) saturate(100%)",
+                                fill: isWishlist ? "#173302" : "none",
+                            }}
+                        />
+                    </button>
                 </span>
                 <span className="flex items-center mt-2">
                     <img
@@ -56,7 +75,7 @@ const ProductCard = ({ product, isWishlist = false }) => {
                         className="w-4 h-4 mr-2"
                         alt="Store"
                     />
-                    <p className="text-sm">{product.store}</p>
+                    <p className="text-sm text-secondary">{product.store}</p>
                     {product.verified && (
                         <img
                             src={ShieldIcon}
@@ -83,18 +102,8 @@ const ProductCard = ({ product, isWishlist = false }) => {
                 )}
                 <span className="flex items-center mb-2">
                     <span className="flex items-baseline">
-                        <p
-                            className={`text-xs mr-2 ${
-                                isWishlist ? "text-[#173302]" : ""
-                            }`}
-                        >
-                            Rp
-                        </p>
-                        <p
-                            className={`text-xl font-bold mr-3 ${
-                                isWishlist ? "text-[#173302]" : ""
-                            }`}
-                        >
+                        <p className={`text-xs mr-2 text-primary`}>Rp</p>
+                        <p className={`text-xl font-bold mr-3 text-primary`}>
                             {formatPrice(product.price)}
                         </p>
                     </span>
@@ -108,7 +117,7 @@ const ProductCard = ({ product, isWishlist = false }) => {
                     )}
                 </span>
             </Link>
-            <button className="bg-[#A1E870] rounded-lg py-2 mt-2 w-full">
+            <button className="bg-[#A1E870] rounded-lg py-2 mt-2 w-full text-primary font-medium">
                 Add To Cart
             </button>
         </div>

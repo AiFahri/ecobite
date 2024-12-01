@@ -38,6 +38,9 @@ Route::get('instant-buy', [TransactionController::class, 'showInstantBuy'])->mid
 
 Route::post('instant-buy', [TransactionController::class, 'storeInstantBuy']);
 
+Route::get('/carts', function () {
+    return Inertia::render('Cart');
+});
 
 // Route::get('/pre', function () {
 //     // dd(Auth::id());

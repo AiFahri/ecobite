@@ -1,43 +1,77 @@
 import { useState } from "react";
 import Navbar from "@/Components/Navbar";
 import Footer from "@/Components/Footer";
+import SimilarSection from "@/Components/ProductDetail/SimilarSection";
+import SearchBar from "@/Components/Catalog/SearchBar";
+import BookmarkIcon from "../../assets/solar_bookmark-linear.svg";
+import BookmarkFilledIcon from "../../assets/solar_bookmark-bold.svg";
 
 // Import gambar-gambar
-import Logo from "../../assets/Logo.png";
-import LogoSvg from "../../assets/Logo.svg";
 import RefreshIcon from "../../assets/assets/refresh.svg";
 import SearchIcon from "../../assets/assets/search.svg";
 import DeleteIcon from "../../assets/assets/delete.svg";
-import Rectangle6802 from "../../assets/Rectangle 6802.png";
-import BookmarkIcon from "../../assets/solar_bookmark-linear.svg";
-import StorefrontIcon from "../../assets/storefront.svg";
-import ShieldIcon from "../../assets/iconamoon_shield-yes-fill.svg";
-import ReviewsStatus from "../../assets/Reviews + Status.svg";
-import Frame237995 from "../../assets/Frame 237995.png";
-import Line20 from "../../assets/Line 20.png";
-import Frame237996 from "../../assets/Frame 237996.png";
 
 const Cart = () => {
     const [searchQuery, setSearchQuery] = useState("");
     const [selectAll, setSelectAll] = useState(false);
 
+    // Data dummy yang lebih sesuai
+    const dummyProducts = [
+        {
+            id: 1,
+            name: "Vegetable Salad",
+            category: "Vegetables",
+            price: 220000,
+            quantity: 1,
+            stock: 54,
+            image: "/path/to/salad-image.jpg",
+            isSelected: false,
+        },
+        {
+            id: 2,
+            name: "Fresh Broccoli",
+            category: "Vegetables",
+            price: 220000,
+            quantity: 1,
+            stock: 23,
+            image: "/path/to/broccoli-image.jpg",
+            isSelected: false,
+        },
+        {
+            id: 3,
+            name: "Breakfast Set",
+            category: "Vegetables",
+            price: 220000,
+            quantity: 1,
+            stock: 51,
+            image: "/path/to/breakfast-image.jpg",
+            isSelected: false,
+        },
+        {
+            id: 4,
+            name: "Smoked Salmon",
+            category: "Heavy Meal",
+            price: 220000,
+            quantity: 1,
+            stock: 44,
+            image: "/path/to/salmon-image.jpg",
+            isSelected: false,
+        },
+    ];
+
     const handleSearch = (e) => {
         setSearchQuery(e.target.value);
+    };
+
+    const handleSearchEnter = () => {
+        // Implementasi pencarian produk di cart
+        console.log("Searching cart items:", searchQuery);
+        // Di sini bisa ditambahkan logika untuk filter produk di cart
     };
 
     const handleSelectAll = () => {
         setSelectAll(!selectAll);
     };
-
-    const similarProducts = [
-        {
-            id: 1,
-            image: Rectangle6802,
-            title: "Fresh Broccoli",
-            price: "7.000",
-            originalPrice: "15.000",
-        },
-    ];
 
     return (
         <div className="overflow-y-scroll no-scrollbar">
@@ -55,29 +89,15 @@ const Cart = () => {
                                 Transaction
                             </h1>
                         </div>
-                        <div className="w-full">
-                            <div className="flex space-x-2">
-                                <button
-                                    id="refresh"
-                                    className="p-2 border rounded-lg"
-                                >
-                                    <img src={RefreshIcon} alt="refresh" />
-                                </button>
-                                <input
-                                    type="text"
-                                    value={searchQuery}
-                                    onChange={handleSearch}
-                                    placeholder="Cari sesuatu di sini ..."
-                                    className="p-2 border rounded-lg w-full"
-                                />
-                                <button className="p-2 border rounded-lg">
-                                    Relevant
-                                </button>
-                                <button className="p-2 border rounded-lg">
-                                    <img src={SearchIcon} alt="search" />
-                                </button>
-                            </div>
-                        </div>
+                        <SearchBar
+                            value={searchQuery}
+                            onChange={handleSearch}
+                            onEnter={handleSearchEnter}
+                            placeholder="Cari sesuatu di keranjang..."
+                            currentPath="/cart"
+                            showIcons={true}
+                            className="w-full"
+                        />
                     </div>
                 </div>
 
@@ -85,29 +105,115 @@ const Cart = () => {
                 <div className="container max-w-screen-xl mx-auto font-outfit">
                     <div className="flex space-x-4">
                         {/* Product Summary */}
-                        <div className="w-2/3 space-y-4">
-                            <div className="flex justify-between items-center p-4 border border-gray-300 rounded-lg">
+                        <div className="w-2/3 bg-white rounded-lg border border-gray-200">
+                            <div className="flex justify-between items-center p-4 border-b">
                                 <h2 className="text-xl font-semibold">
                                     Product Summary
                                 </h2>
-                                <div className="flex space-x-2">
-                                    <span>Delete All</span>
-                                    <button>
-                                        <img src={DeleteIcon} alt="delete" />
+                                <div className="flex items-center space-x-6">
+                                    <button className="flex items-center space-x-2 text-gray-600">
+                                        <span>Delete All</span>
+                                        <img
+                                            src={DeleteIcon}
+                                            alt="delete"
+                                            className="w-5 h-5"
+                                        />
                                     </button>
-                                    <span className="flex justify-center items-center space-x-2">
-                                        <span>Choose All</span>
+                                    <div className="flex items-center space-x-2">
+                                        <span className="text-gray-600">
+                                            Choose All
+                                        </span>
                                         <input
                                             type="checkbox"
                                             checked={selectAll}
-                                            onChange={handleSelectAll}
-                                            className="w-[20px] h-[20px] border border-gray-300 p-1 rounded"
+                                            onChange={() =>
+                                                setSelectAll(!selectAll)
+                                            }
+                                            className="w-5 h-5 border border-gray-300 rounded"
                                         />
-                                    </span>
+                                    </div>
                                 </div>
                             </div>
-                            <div id="productList">
-                                {/* Product list akan ditambahkan di sini */}
+
+                            {/* Product List */}
+                            <div className="divide-y">
+                                {dummyProducts.map((product) => (
+                                    <div
+                                        key={product.id}
+                                        className="p-4 flex items-start"
+                                    >
+                                        <input
+                                            type="checkbox"
+                                            checked={product.isSelected}
+                                            onChange={() => {}}
+                                            className="mt-2 w-5 h-5 border border-gray-300 rounded mr-4"
+                                        />
+
+                                        <img
+                                            src={product.image}
+                                            alt={product.name}
+                                            className="w-20 h-20 object-cover rounded-lg mr-4"
+                                        />
+
+                                        <div className="flex-1">
+                                            <span className="text-sm text-gray-500">
+                                                {product.category}
+                                            </span>
+                                            <h3 className="text-lg font-medium mt-1">
+                                                {product.name}
+                                            </h3>
+
+                                            <div className="flex items-center mt-3">
+                                                <div className="flex border rounded-lg overflow-hidden">
+                                                    <button className="px-3 py-1 bg-white border-r hover:bg-gray-100">
+                                                        −
+                                                    </button>
+                                                    <input
+                                                        type="text"
+                                                        value={product.quantity}
+                                                        className="w-12 text-center"
+                                                        readOnly
+                                                    />
+                                                    <button className="px-3 py-1 bg-white border-l hover:bg-gray-100">
+                                                        +
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            <p className="text-sm text-gray-600 mt-2">
+                                                Stock Total: {product.stock} pcs
+                                            </p>
+                                        </div>
+
+                                        <div className="flex flex-col items-end space-y-2">
+                                            <div className="text-right">
+                                                <span className="text-sm text-gray-500">
+                                                    Total : x{product.quantity}
+                                                </span>
+                                                <p className="font-semibold">
+                                                    Rp{" "}
+                                                    {product.price.toLocaleString()}
+                                                </p>
+                                            </div>
+                                            <div className="flex space-x-2">
+                                                <button className="p-2 hover:bg-gray-100 rounded">
+                                                    <img
+                                                        src={BookmarkIcon}
+                                                        alt="Save"
+                                                        className="w-5 h-5"
+                                                    />
+                                                </button>
+                                                <button className="p-2 hover:bg-gray-100 rounded">
+                                                    <img
+                                                        src={DeleteIcon}
+                                                        alt="Delete"
+                                                        className="w-5 h-5"
+                                                    />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
                         </div>
 
@@ -116,23 +222,39 @@ const Cart = () => {
                             <h2 className="text-xl font-semibold mb-4">
                                 Rincian Harga
                             </h2>
-                            <div className="flex justify-between mb-2">
-                                <span>Price Total</span>
-                                <span>Rp 0</span>
+                            <div className="space-y-3 mb-4">
+                                <div className="flex justify-between text-gray-600">
+                                    <span>Price Total</span>
+                                    <span className="text-[#173302]">Rp 0</span>
+                                </div>
+                                <div className="flex justify-between text-gray-600">
+                                    <span>Delivery</span>
+                                    <span className="text-[#173302]">Rp 0</span>
+                                </div>
+                                <div className="flex justify-between text-gray-600">
+                                    <span>Discount (Promo)</span>
+                                    <span className="text-[#173302]">Rp 0</span>
+                                </div>
+                                <div className="border-t pt-3">
+                                    <div className="flex justify-between font-semibold">
+                                        <span>Total</span>
+                                        <span className="text-[#173302]">
+                                            Rp 0
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
-                            <div className="flex justify-between mb-2">
-                                <span>Delivery</span>
-                                <span>Rp 0</span>
+
+                            {/* Promo Banner */}
+                            <div className="bg-[#173302] text-white rounded-lg p-4 mb-4 text-center">
+                                <h3 className="font-semibold text-lg">
+                                    Enjoy Special Promo
+                                </h3>
+                                <p>For New User!</p>
                             </div>
-                            <div className="flex justify-between mb-2">
-                                <span>Discount (Promo)</span>
-                                <span>Rp 0</span>
-                            </div>
-                            <div className="flex justify-between mb-4">
-                                <span className="font-semibold">Total</span>
-                                <span>Rp 0</span>
-                            </div>
-                            <button className="w-full bg-green-500 text-white py-2 rounded-md">
+
+                            {/* Button Pesan */}
+                            <button className="w-full bg-[#A1E870] text-[#173302] font-semibold py-3 rounded-lg">
                                 Pesan Sekarang
                             </button>
                         </div>
@@ -140,87 +262,8 @@ const Cart = () => {
                 </div>
             </div>
 
-            {/* Similar Selection */}
-            <div className="font-outfit max-w-screen-xl container mx-auto flex justify-between items-center mt-10">
-                <p className="font-bold text-2xl text-[#173302]">
-                    Similar Selection
-                </p>
-                <span className="flex space-x-3">
-                    <img src={Frame237995} alt="Previous" />
-                    <img src={Line20} alt="Separator" />
-                    <img src={Frame237996} alt="Next" />
-                </span>
-            </div>
-
-            {/* Similar Products Grid */}
-            <section className="hero-7">
-                <div className="container max-w-screen-xl mx-auto font-outfit">
-                    <div className="grid grid-cols-4 gap-6">
-                        {similarProducts.map((product) => (
-                            <div
-                                key={product.id}
-                                className="border border-slate-400 flex flex-col p-4 rounded-lg mt-10"
-                            >
-                                <span className="relative">
-                                    <button className="bg-[#FC5A32] px-2 py-1 absolute top-3 left-2 rounded-lg text-white">
-                                        5% Discount
-                                    </button>
-                                    <img
-                                        src={product.image}
-                                        className="w-full"
-                                        alt={product.title}
-                                    />
-                                </span>
-                                <span className="flex justify-between items-center mt-4">
-                                    <p className="font-semibold text-xl">
-                                        {product.title}
-                                    </p>
-                                    <img
-                                        src={BookmarkIcon}
-                                        className="w-5 h-6"
-                                        alt="Bookmark"
-                                    />
-                                </span>
-                                <span className="flex items-center mt-2">
-                                    <img
-                                        src={StorefrontIcon}
-                                        className="w-4 h-4 mr-2"
-                                        alt="Store"
-                                    />
-                                    <p className="text-sm">Hotel California</p>
-                                    <img
-                                        src={ShieldIcon}
-                                        className="w-4 h-4 ml-2"
-                                        alt="Shield"
-                                    />
-                                </span>
-                                <img
-                                    src={ReviewsStatus}
-                                    className="w-1/2 mt-2 mb-4"
-                                    alt="Reviews"
-                                />
-                                <span className="flex items-center mb-2">
-                                    <span className="flex items-baseline">
-                                        <p className="text-xs mr-2">Rp</p>
-                                        <p className="text-xl font-bold mr-3">
-                                            {product.price}
-                                        </p>
-                                    </span>
-                                    <span className="relative">
-                                        <p className="text-md text-red-500">
-                                            Rp {product.originalPrice}
-                                        </p>
-                                        <div className="absolute top-1/2 border border-black w-full"></div>
-                                    </span>
-                                </span>
-                                <button className="bg-[#A1E870] rounded-lg py-2 mt-2 w-full">
-                                    Add To Cart
-                                </button>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </section>
+            {/* Similar Section */}
+            <SimilarSection />
 
             <Footer />
         </div>

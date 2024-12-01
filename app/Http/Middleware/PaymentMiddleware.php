@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\Session;
 
 class PaymentMiddleware
 {
@@ -15,14 +16,12 @@ class PaymentMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-
-        // dd($request->session());
-        if ($request->routeIs('instant-buy') && !$request->session()->has('instant-buy')) {
-            return redirect()->route('products.index');
+        \Log::info('Payment Middleware Session:', Session::get('instant-buy'));
+        
+        if (!Session::has('instant-buy')) {
+            return redirect()->route('catalog.index');
         }
-
-        // dd($request->routeIs('instant-buy'));
-
+        
         return $next($request);
     }
 }

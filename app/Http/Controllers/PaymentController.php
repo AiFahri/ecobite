@@ -10,7 +10,6 @@ use Illuminate\Http\Request;
 use App\Models\Product;
 use Midtrans\Snap;
 use Midtrans\Config;
-use Inertia\Inertia;
 
 class PaymentController extends Controller
 {
@@ -24,28 +23,14 @@ class PaymentController extends Controller
         Config::$is3ds = config('midtrans.is_3ds');
     }
 
-    public function index(Request $request)
-    {
-        $product = Product::with('tenant')->findOrFail($request->product_id);
-        $quantity = $request->quantity;
-        
-        // Nilai default untuk delivery fee dan promo voucher
-        $delivery_fee = 10000;
-        $promo_voucher = 10000;
-
-        return inertia('Payment', [
-            'product' => $product,
-            'quantity' => $quantity,
-            'delivery_fee' => $delivery_fee,
-            'promo_voucher' => $promo_voucher
-        ]);
-    }
+    public function index() {}
 
     public function store(PaymentRequest $request)
     {
+
         $request->validated();
 
-        $product = Product::with('tenant', 'productMedia')->find($request['product_id']);
+        $product = Product::find($request['product_id']);
         $total = $product->discount_price * $request['quantity'];
 
         $transactionId = (string) \Illuminate\Support\Str::ulid();
@@ -81,24 +66,12 @@ class PaymentController extends Controller
         $transaction->token = $snapToken;
         $transaction->save();
 
-        // Format response sesuai struktur yang diinginkan
-        return Inertia::render('Payment/Confirmation', [
-            'product' => [
-                'id' => $product->id,
-                'name' => $product->name,
-                'price' => $product->price,
-                'photo_url' => $product->productMedia->first()?->photo_url,
-                'tenant' => [
-                    'name' => $product->tenant->name,
-                    'city' => $product->tenant->city,
-                    'state' => $product->tenant->state,
-                ],
-            ],
-            'quantity' => (int) $request['quantity'],
-            'delivery_fee' => 10000,
-            'promo_voucher' => 10000,
-            'transaction' => [
-                'id' => $transaction->id,
+        // Lakukan sesuatu dengan data valid
+        return response()->json([
+            'message' => 'success create payment',
+            'data' =>
+            [
+                'transaction_id' => $transaction->id,
                 'snap_token' => $snapToken,
             ],
         ]);
