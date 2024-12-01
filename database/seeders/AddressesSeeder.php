@@ -27,6 +27,7 @@ class AddressesSeeder extends Seeder
             DB::table('addresses')->insert([
                 'id' => (string) Str::ulid(),
                 'name' => $firstName . "'s Primary Address",
+                'phone_number' => $faker->phoneNumber,
                 'detailed_address' => $faker->streetAddress,
                 'city' => $faker->city,
                 'state' => $faker->state,
