@@ -40,15 +40,21 @@ const Login = () => {
                 remember: rememberMe,
             },
             {
-                onSuccess: () => {},
+                onSuccess: () => {
+                    console.log("Login berhasil");
+                    router.visit("/dashboard");
+                },
                 onError: (errors) => {
                     setErrors(errors);
+                    console.log("Login error:", errors);
                 },
                 onStart: () => {
                     setProcessing(true);
+                    console.log("Login dimulai");
                 },
                 onFinish: () => {
                     setProcessing(false);
+                    console.log("Login selesai");
                 },
             }
         );

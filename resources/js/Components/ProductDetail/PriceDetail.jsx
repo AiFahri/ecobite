@@ -19,11 +19,17 @@ const PriceDetail = ({ product }) => {
     const totalPrice = basePrice + deliveryFee - promoVoucher;
 
     const handleBuyNow = () => {
-        router.get(`/payment?product_id=${product.id}&quantity=${quantity}`);
+        router.visit(`/payment?product_id=${product.id}&quantity=${quantity}`, {
+            preserveState: true,
+            preserveScroll: true,
+        });
     };
 
     const handleAddToCart = () => {
-        router.get(`/cart?product_id=${product.id}&quantity=${quantity}`);
+        router.visit(`/cart?product_id=${product.id}&quantity=${quantity}`, {
+            preserveState: true,
+            preserveScroll: true,
+        });
     };
 
     return (

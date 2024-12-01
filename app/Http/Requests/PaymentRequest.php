@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class InstantBuyRequest extends FormRequest
+class PaymentRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -62,7 +62,6 @@ class InstantBuyRequest extends FormRequest
             ],
 
             'address_id' => [
-                'nullable',
                 'string',
                 'exists:addresses,id', // Harus ada di tabel addresses
                 function ($attribute, $value, $fail) {

@@ -7,7 +7,8 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\TransactionController;
 use Illuminate\Container\Attributes\Auth;
 use Illuminate\Support\Facades\Route;
-use PHPUnit\Event\Tracer\Tracer;
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\WishlistController;
 
 Route::middleware('guest')->group(function () {
     Route::get('register', [RegisteredUserController::class, 'create'])->name('register');
@@ -30,4 +31,14 @@ Route::middleware('auth')->group(function () {
         ->name('logout');
 
     Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+    // Route::get('/cart', [CartController::class, 'show'])->name('cart');
+
+    Route::get('/instant-buy', [TransactionController::class, 'showInstantBuy'])->middleware('payment')->name('instant-buy');
+
+    Route::post('/instant-buy', [TransactionController::class, 'storeInstantBuy']);
+
+    Route::post('/payment', [PaymentController::class, 'store'])->name('payment.store');
+
+    Route::get('/wishlists', [WishlistController::class, 'show'])->name('wishlist');
+    Route::post('/wishlist/toggle', [WishlistController::class, 'toggleWishlist']);
 });
