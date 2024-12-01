@@ -3,7 +3,6 @@
 use App\Http\Controllers\CatalogController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\TransactionController;
 
@@ -26,7 +25,7 @@ Route::get('/productdetail', function () {
 Route::get('/products', [CatalogController::class, 'index'])->name('products.index');
 Route::get('/payment', function () {
     return Inertia::render('Payment');
-}); 
+});
 
 Route::get('/cart', function () {
     return Inertia::render('Cart');
@@ -34,17 +33,16 @@ Route::get('/cart', function () {
 Route::get('/products/{productID}', [CatalogController::class, 'show'])->name('products.show');
 
 Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('login.post');
-Route::get('/payment', [PaymentController::class, 'index'])->name('payment.index');
 
-Route::get('instant-buy', [TransactionController::class, 'showInstantBuy'])->middleware('payment')->name('instant-buy');
-
-Route::post('instant-buy', [TransactionController::class, 'storeInstantBuy']);
-
-Route::get('pre', function () {
+Route::get('/pre', function () {
 
     // dd(Auth::id());
 
     return view('pre');
 })->name('pre');
+
+Route::get('/pre2', function () {
+    return view('pre2');
+})->name('pre2');
 
 require __DIR__ . '/auth.php';
