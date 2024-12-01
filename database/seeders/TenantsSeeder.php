@@ -22,6 +22,7 @@ class TenantsSeeder extends Seeder
             DB::table('tenants')->insert([
                 'id' => (string) \Illuminate\Support\Str::ulid(),
                 'name' => $faker->company,
+                'stars' => $faker->numberBetween(3, 5),
                 'is_verified' => $faker->boolean,
                 'city' => $faker->city,
                 'state' => $faker->state,

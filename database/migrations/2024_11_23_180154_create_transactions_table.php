@@ -15,7 +15,8 @@ return new class extends Migration
             $table->ulid('id')->primary();
             $table->bigInteger('total');
             $table->string('status');
-            $table->string('payment_type');
+            $table->string('payment_type')->nullable();
+            $table->uuid('token');
             $table->timestamps();
             $table->foreignUlid('address_id')->constrained('addresses')->onDelete('cascade');
         });

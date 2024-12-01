@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('tenants', function (Blueprint $table) {
             $table->ulid('id')->primary();
             $table->string('name');
+            $table->tinyInteger('stars')->default(0);
             $table->boolean('is_verified')->default(false);
             $table->text('photo_url')->nullable();
             $table->string('city');

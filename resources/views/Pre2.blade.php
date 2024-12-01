@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Instant Buy</title>
+    <title>payment</title>
 </head>
 <body>
-    <form action="/instant-buy" method="POST">
+    <form action="/payment" method="POST">
         @csrf
 
         @if ($errors->any())
