@@ -51,6 +51,14 @@ class CatalogController extends Controller
         if ($request->has('min_price') || $request->has('max_price')) {
             $products->where(function ($query) use ($request) {
                 if ($request->filled('min_price') && $request->filled('max_price')) {
+                    $query->whereBetween('price', [
+                        $request->min_price,
+                        $request->max_price
+                    ]);
+                } elseif ($request->filled('min_price')) {
+                    $query->where('price', '>=', $request->min_price);
+                } elseif ($request->filled('max_price')) {
+                    $query->where('price', '<=', $request->max_price);
                     // Filter untuk min_price dan max_price secara bersamaan
                     $query->where(function ($subQuery) use ($request) {
                         $subQuery->whereBetween('price', [$request->min_price, $request->max_price])
@@ -74,7 +82,12 @@ class CatalogController extends Controller
             $products->havingRaw('FLOOR(COALESCE(ratings_avg_star, 0)) IN (' . implode(',', $ratings) . ')');
         }
 
-        $products = $products->paginate(12);
+        $productsData = $products->paginate(12);
+
+        $productsData->through(function ($product) use ($wishlists) {
+            $product->is_wishlisted = in_array($product->id, $wishlists);
+            return $product;
+        });
 
         // dd($products);
 
@@ -103,7 +116,7 @@ class CatalogController extends Controller
             ->get();
 
         return Inertia::render('Catalog', [
-            'products' => $products,
+            'products' => $productsData,
             'wishlists' => $wishlists,
             'productTypes' => $productTypes,
             'tenantTypes' => $tenantTypes,
@@ -121,18 +134,40 @@ class CatalogController extends Controller
             ->with(['transactionItem.transaction.address.user'])
             ->paginate(5);
 
-        $similar_products = Product::with('productType')
+        // Ambil similar products
+        $similar_products = Product::with(['productMedia', 'tenant', 'productType'])
             ->select('products.*')
             ->join('product_types', 'products.product_type_id', '=', 'product_types.id')
             ->join('transaction_items', 'products.id', '=', 'transaction_items.product_id')
             ->join('transaction_item_ratings', 'transaction_items.id', '=', 'transaction_item_ratings.transaction_item_id')
+            ->where('product_types.name', $product->productType->name)
+            ->where('products.id', '!=', $productID)
             ->groupBy('products.id')
-            ->selectRaw('FLOOR(AVG(transaction_item_ratings.star)) as avg_stars')
+            ->selectRaw('AVG(transaction_item_ratings.star) as avg_stars')
             ->orderBy('avg_stars', 'DESC')
             ->limit(16)
             ->get();
 
-        ReviewResource::collection($ratings);
+        // Transform similar products untuk frontend
+        $similar_products = $similar_products->map(function ($product) {
+            $userId = auth()->user()?->id;
+
+            return [
+                'id' => $product->id,
+                'name' => $product->name,
+                'price' => $product->price,
+                'discount_price' => $product->discount_price,
+                'photo_urls' => $product->productMedia->pluck('photo_url'),
+                'avg_stars' => round($product->avg_stars),
+                'tenant' => [
+                    'name' => $product->tenant->name,
+                    'is_verified' => $product->tenant->is_verified
+                ],
+                'is_wishlisted' => $userId ? $product->wishlists()
+                    ->where('user_id', $userId)
+                    ->exists() : false
+            ];
+        });
 
         return Inertia::render('ProductDetail', [
             'product' => new ProductResource($product),
@@ -145,11 +180,7 @@ class CatalogController extends Controller
                     'total' => $ratings->total(),
                 ]
             ],
-            'meta' => [
-                'from' => $ratings->firstItem(),
-                'to' => $ratings->lastItem(),
-                'total' => $ratings->total(),
-            ]
+            'similar_products' => $similar_products
         ]);
     }
 }

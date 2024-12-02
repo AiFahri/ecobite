@@ -8,7 +8,13 @@ import ProductFilter from "@/Components/Catalog/ProductFilter";
 import PromoImage from "../../assets/promo2.png";
 
 const Wishlist = () => {
-    const { wishlists = { data: [] } } = usePage().props;
+    const {
+        wishlists = { data: [] },
+        productTypes = [],
+        tenantTypes = [],
+        starCount = [],
+        filters = {},
+    } = usePage().props;
     const [searchQuery, setSearchQuery] = React.useState("");
     const [filteredProducts, setFilteredProducts] = React.useState(
         wishlists.data || []
@@ -77,7 +83,11 @@ const Wishlist = () => {
                             <div className="grid grid-cols-4 gap-6 mb-20">
                                 {/* Filter Column */}
                                 <div className="row-span-full">
-                                    <ProductFilter />
+                                    <ProductFilter
+                                        productTypes={productTypes}
+                                        tenantTypes={tenantTypes}
+                                        starCount={starCount}
+                                    />
                                     <div className="rounded-lg mt-6 h-fit text-center font-outfit font-semibold">
                                         <img
                                             src={PromoImage}

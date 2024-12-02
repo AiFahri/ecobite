@@ -26,7 +26,7 @@ import BookmarkFilledIcon from "../../assets/solar_bookmark-bold.svg";
 import ShareIcon from "../../assets/share.svg"; // Tambahkan icon share
 
 const ProductDetail = () => {
-    const { product, reviews, meta } = usePage().props;
+    const { product, reviews, meta, similar_products } = usePage().props;
     const productData = product?.data?.product;
     const tenantData = product?.data?.tenant;
     const [searchQuery, setSearchQuery] = useState("");
@@ -287,9 +287,7 @@ const ProductDetail = () => {
                 </div>
             </div>
 
-            <SimilarSection
-                similarProducts={product?.data?.similar_products || []}
-            />
+            <SimilarSection similarProducts={similar_products || []} />
 
             <Footer />
         </div>

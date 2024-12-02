@@ -138,11 +138,6 @@ const Catalog = () => {
                                     productTypes={productTypes || []}
                                     tenantTypes={tenantTypes || []}
                                     starCount={starCount || []}
-                                    selectedType={selectedType}
-                                    setSelectedType={setSelectedType}
-                                    selectedRating={selectedRating}
-                                    setSelectedRating={setSelectedRating}
-                                    onFilter={handleFilter}
                                 />
                                 <div className="rounded-lg mt-6 h-fit text-center font-outfit font-semibold">
                                     <img
@@ -161,6 +156,7 @@ const Catalog = () => {
                                                 id: product.id,
                                                 ratings:
                                                     product.ratings_avg_star,
+                                                price: product.price,
                                                 // ... other data
                                             });
                                             return (
@@ -192,8 +188,9 @@ const Catalog = () => {
                                                                 ?.is_verified ||
                                                             false,
                                                         rating:
-                                                            Math.floor(product.ratings_avg_star) ||
-                                                            0,
+                                                            Math.floor(
+                                                                product.ratings_avg_star
+                                                            ) || 0,
                                                     }}
                                                     isWishlist={wishlists.includes(
                                                         product.id.toString()

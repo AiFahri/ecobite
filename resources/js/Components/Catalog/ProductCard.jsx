@@ -1,5 +1,5 @@
 import { Link } from "@inertiajs/react";
-import React from "react";
+import React, { useState } from "react";
 import BookmarkIcon from "../../../assets/solar_bookmark-linear.svg";
 import BookmarkFilledIcon from "../../../assets/solar_bookmark-bold.svg";
 import StorefrontIcon from "../../../assets/storefront.svg";
@@ -7,16 +7,48 @@ import ShieldIcon from "../../../assets/iconamoon_shield-yes-fill.svg";
 import { router } from "@inertiajs/react";
 
 const ProductCard = ({ product, isWishlist = false, onToggleWishlist }) => {
+    const [isWishlisted, setIsWishlisted] = useState(isWishlist);
+    const [isLoading, setIsLoading] = useState(false);
+
     const formatPrice = (price) => {
         return price?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     };
 
-    const handleBookmarkClick = (e) => {
+    const handleBookmarkClick = async (e) => {
         e.preventDefault();
         e.stopPropagation();
-        console.log("Bookmark clicked for product ID:", product.id);
-        if (onToggleWishlist) {
-            onToggleWishlist();
+
+        if (isLoading) return;
+
+        setIsLoading(true);
+
+        try {
+            router.post(
+                "/wishlist/toggle",
+                { product_id: product.id },
+                {
+                    preserveState: true,
+                    preserveScroll: true,
+                    onSuccess: (response) => {
+                        setIsWishlisted(!isWishlisted);
+                        if (onToggleWishlist) {
+                            onToggleWishlist();
+                        }
+                    },
+                    onError: (errors) => {
+                        // Handle error - misalnya user belum login
+                        if (errors?.message === "Unauthenticated.") {
+                            window.location.href = "/login";
+                        }
+                    },
+                    onFinish: () => {
+                        setIsLoading(false);
+                    },
+                }
+            );
+        } catch (error) {
+            console.error("Error toggling wishlist:", error);
+            setIsLoading(false);
         }
     };
 
@@ -54,17 +86,22 @@ const ProductCard = ({ product, isWishlist = false, onToggleWishlist }) => {
                     </p>
                     <button
                         onClick={handleBookmarkClick}
-                        className="focus:outline-none"
+                        className={`focus:outline-none transition-opacity duration-200 ${
+                            isLoading ? "opacity-50" : "opacity-100"
+                        }`}
+                        disabled={isLoading}
                     >
                         <img
-                            src={isWishlist ? BookmarkFilledIcon : BookmarkIcon}
+                            src={
+                                isWishlisted ? BookmarkFilledIcon : BookmarkIcon
+                            }
                             className="w-5 h-6"
                             alt="Bookmark"
                             style={{
-                                filter: isWishlist
+                                filter: isWishlisted
                                     ? "none"
                                     : "brightness(0) saturate(100%)",
-                                fill: isWishlist ? "#173302" : "none",
+                                fill: isWishlisted ? "#173302" : "none",
                             }}
                         />
                     </button>
@@ -84,7 +121,7 @@ const ProductCard = ({ product, isWishlist = false, onToggleWishlist }) => {
                         />
                     )}
                 </span>
-                {(
+                {
                     <div className="flex items-center mt-2">
                         {[...Array(5)].map((_, i) => (
                             <span
@@ -99,7 +136,7 @@ const ProductCard = ({ product, isWishlist = false, onToggleWishlist }) => {
                             </span>
                         ))}
                     </div>
-                )}
+                }
                 <span className="flex items-center mb-2">
                     <span className="flex items-baseline">
                         <p className={`text-xs mr-2 text-primary`}>Rp</p>
