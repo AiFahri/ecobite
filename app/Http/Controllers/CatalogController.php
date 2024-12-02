@@ -116,7 +116,8 @@ class CatalogController extends Controller
             ->with(['transactionItem.transaction.address.user'])
             ->paginate(5);
 
-            $similar_products = Product::with('productType')
+        // Ambil similar products
+        $similar_products = Product::with(['productMedia', 'tenant', 'productType'])
             ->select('products.*')
             ->join('product_types', 'products.product_type_id', '=', 'product_types.id')
             ->join('transaction_items', 'products.id', '=', 'transaction_items.product_id')
@@ -129,7 +130,24 @@ class CatalogController extends Controller
             ->limit(16)
             ->get();
 
-        ReviewResource::collection($ratings);
+        // Transform similar products untuk frontend
+        $similar_products = $similar_products->map(function ($product) {
+            return [
+                'id' => $product->id,
+                'name' => $product->name,
+                'price' => $product->price,
+                'discount_price' => $product->discount_price,
+                'photo_urls' => $product->productMedia->pluck('photo_url'),
+                'avg_stars' => round($product->avg_stars),
+                'tenant' => [
+                    'name' => $product->tenant->name,
+                    'is_verified' => $product->tenant->is_verified
+                ],
+                'is_wishlisted' => $product->wishlists()
+                    ->where('user_id', auth()->id())
+                    ->exists()
+            ];
+        });
 
         return Inertia::render('ProductDetail', [
             'product' => new ProductResource($product),
@@ -142,11 +160,7 @@ class CatalogController extends Controller
                     'total' => $ratings->total(),
                 ]
             ],
-            'meta' => [
-                'from' => $ratings->firstItem(),
-                'to' => $ratings->lastItem(),
-                'total' => $ratings->total(),
-            ]
+            'similar_products' => $similar_products
         ]);
     }
 }
