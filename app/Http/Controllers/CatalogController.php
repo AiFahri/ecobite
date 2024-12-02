@@ -51,19 +51,14 @@ class CatalogController extends Controller
         if ($request->has('min_price') || $request->has('max_price')) {
             $products->where(function ($query) use ($request) {
                 if ($request->filled('min_price') && $request->filled('max_price')) {
-                    // Filter untuk min_price dan max_price secara bersamaan
-                    $query->where(function ($subQuery) use ($request) {
-                        $subQuery->whereBetween('price', [$request->min_price, $request->max_price])
-                            ->orWhereBetween('discount_price', [$request->min_price, $request->max_price]);
-                    });
+                    $query->whereBetween('price', [
+                        $request->min_price, 
+                        $request->max_price
+                    ]);
                 } elseif ($request->filled('min_price')) {
-                    // Filter hanya untuk min_price
-                    $query->where('price', '>=', $request->min_price)
-                        ->orWhere('discount_price', '>=', $request->min_price);
+                    $query->where('price', '>=', $request->min_price);
                 } elseif ($request->filled('max_price')) {
-                    // Filter hanya untuk max_price
-                    $query->where('price', '<=', $request->max_price)
-                        ->orWhere('discount_price', '<=', $request->max_price);
+                    $query->where('price', '<=', $request->max_price);
                 }
             });
         }
@@ -121,13 +116,15 @@ class CatalogController extends Controller
             ->with(['transactionItem.transaction.address.user'])
             ->paginate(5);
 
-        $similar_products = Product::with('productType')
+            $similar_products = Product::with('productType')
             ->select('products.*')
             ->join('product_types', 'products.product_type_id', '=', 'product_types.id')
             ->join('transaction_items', 'products.id', '=', 'transaction_items.product_id')
             ->join('transaction_item_ratings', 'transaction_items.id', '=', 'transaction_item_ratings.transaction_item_id')
+            ->where('product_types.name', $product->productType->name)
+            ->where('products.id', '!=', $productID)
             ->groupBy('products.id')
-            ->selectRaw('FLOOR(AVG(transaction_item_ratings.star)) as avg_stars')
+            ->selectRaw('AVG(transaction_item_ratings.star) as avg_stars')
             ->orderBy('avg_stars', 'DESC')
             ->limit(16)
             ->get();
