@@ -69,7 +69,12 @@ class CatalogController extends Controller
             $products->havingRaw('FLOOR(COALESCE(ratings_avg_star, 0)) IN (' . implode(',', $ratings) . ')');
         }
 
-        $products = $products->paginate(12);
+        $productsData = $products->paginate(12);
+
+        $productsData->through(function ($product) use ($wishlists) {
+            $product->is_wishlisted = in_array($product->id, $wishlists);
+            return $product;
+        });
 
         // dd($products);
 
@@ -98,7 +103,7 @@ class CatalogController extends Controller
             ->get();
 
         return Inertia::render('Catalog', [
-            'products' => $products,
+            'products' => $productsData,
             'wishlists' => $wishlists,
             'productTypes' => $productTypes,
             'tenantTypes' => $tenantTypes,
@@ -132,6 +137,8 @@ class CatalogController extends Controller
 
         // Transform similar products untuk frontend
         $similar_products = $similar_products->map(function ($product) {
+            $userId = auth()->user()?->id;
+            
             return [
                 'id' => $product->id,
                 'name' => $product->name,
@@ -143,9 +150,9 @@ class CatalogController extends Controller
                     'name' => $product->tenant->name,
                     'is_verified' => $product->tenant->is_verified
                 ],
-                'is_wishlisted' => $product->wishlists()
-                    ->where('user_id', auth()->id())
-                    ->exists()
+                'is_wishlisted' => $userId ? $product->wishlists()
+                    ->where('user_id', $userId)
+                    ->exists() : false
             ];
         });
 

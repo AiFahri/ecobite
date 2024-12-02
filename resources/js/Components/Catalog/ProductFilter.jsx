@@ -3,7 +3,11 @@ import { router } from "@inertiajs/react";
 import ReviewsStatusIcon from "../../../assets/Reviews + Status.svg";
 import Logo from "../../../assets/logo.png";
 
-const ProductFilter = ({ productTypes, tenantTypes, starCount }) => {
+const ProductFilter = ({
+    productTypes = [],
+    tenantTypes = [],
+    starCount = [],
+}) => {
     const [selectedTenantTypes, setSelectedTenantTypes] = useState([]);
     const [priceRange, setPriceRange] = useState({
         min_price: 30000,
