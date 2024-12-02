@@ -19,7 +19,7 @@ class DatabaseSeeder extends Seeder
             // Core Data
             TenantsSeeder::class,
             ProductsSeeder::class,
-            ProductMediaSeeder::class,
+            // ProductMediaSeeder::class,
 
             // User Related
             UsersSeeder::class,
@@ -33,6 +33,9 @@ class DatabaseSeeder extends Seeder
             // Transactions
             TransactionSeeder::class,
             CartsSeeder::class,
+
+            //
+            AdminSeeder::class,
         ]);
     }
 }

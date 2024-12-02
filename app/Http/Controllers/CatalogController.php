@@ -52,13 +52,26 @@ class CatalogController extends Controller
             $products->where(function ($query) use ($request) {
                 if ($request->filled('min_price') && $request->filled('max_price')) {
                     $query->whereBetween('price', [
-                        $request->min_price, 
+                        $request->min_price,
                         $request->max_price
                     ]);
                 } elseif ($request->filled('min_price')) {
                     $query->where('price', '>=', $request->min_price);
                 } elseif ($request->filled('max_price')) {
                     $query->where('price', '<=', $request->max_price);
+                    // Filter untuk min_price dan max_price secara bersamaan
+                    $query->where(function ($subQuery) use ($request) {
+                        $subQuery->whereBetween('price', [$request->min_price, $request->max_price])
+                            ->orWhereBetween('discount_price', [$request->min_price, $request->max_price]);
+                    });
+                } elseif ($request->filled('min_price')) {
+                    // Filter hanya untuk min_price
+                    $query->where('price', '>=', $request->min_price)
+                        ->orWhere('discount_price', '>=', $request->min_price);
+                } elseif ($request->filled('max_price')) {
+                    // Filter hanya untuk max_price
+                    $query->where('price', '<=', $request->max_price)
+                        ->orWhere('discount_price', '<=', $request->max_price);
                 }
             });
         }
@@ -138,7 +151,7 @@ class CatalogController extends Controller
         // Transform similar products untuk frontend
         $similar_products = $similar_products->map(function ($product) {
             $userId = auth()->user()?->id;
-            
+
             return [
                 'id' => $product->id,
                 'name' => $product->name,
