@@ -262,9 +262,6 @@ const Cart = () => {
                 </div>
             </div>
 
-            {/* Similar Section */}
-            <SimilarSection />
-
             <Footer />
         </div>
     );

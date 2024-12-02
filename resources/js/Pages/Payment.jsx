@@ -23,6 +23,18 @@ const Payment = () => {
 
     console.log("Payment Page Props:", usePage().props);
 
+    useEffect(() => {
+        // Load Midtrans script
+        const script = document.createElement("script");
+        script.src = "https://app.sandbox.midtrans.com/snap/snap.js";
+        script.setAttribute("data-client-key", "YOUR_MIDTRANS_CLIENT_KEY");
+        document.head.appendChild(script);
+
+        return () => {
+            document.head.removeChild(script);
+        };
+    }, []);
+
     // Jika data belum ada, tampilkan loading
     if (!product || !quantity) {
         return (
@@ -48,14 +60,14 @@ const Payment = () => {
             "/payment",
             {
                 product_id: product.id,
-                quantity: product.quantity,
+                quantity: quantity,
                 address_id: selectedAddress.id,
                 voucher_id: voucher ? voucher[0]?.id : null,
             },
             {
-                preserveScroll: true,
                 onSuccess: (response) => {
-                    window.snap.pay(response.data.snap_token, {
+                    const snapToken = response.data.snap_token;
+                    window.snap.pay(snapToken, {
                         onSuccess: function (result) {
                             console.log("Payment success:", result);
                             router.visit("/dashboard");
@@ -64,7 +76,7 @@ const Payment = () => {
                             console.log("Payment pending:", result);
                         },
                         onError: function (result) {
-                            console.log("Payment error:", result);
+                            console.error("Payment error:", result);
                         },
                         onClose: function () {
                             console.log(

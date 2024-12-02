@@ -19,10 +19,25 @@ const PriceDetail = ({ product }) => {
     const totalPrice = basePrice + deliveryFee - promoVoucher;
 
     const handleBuyNow = () => {
-        router.post("/instant-buy", {
-            product_id: product.id,
-            quantity: quantity,
-        });
+        router.post(
+            "/instant-buy",
+            {
+                product_id: product.id,
+                quantity: quantity,
+            },
+            {
+                onSuccess: () => {
+                    // Akan redirect otomatis ke payment page karena ada middleware
+                    console.log("Redirecting to payment page...");
+                },
+                onError: (errors) => {
+                    console.error("Error:", errors);
+                    if (errors?.message === "Unauthenticated.") {
+                        window.location.href = "/login";
+                    }
+                },
+            }
+        );
     };
 
     const handleAddToCart = () => {

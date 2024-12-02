@@ -27,6 +27,8 @@ import ShareIcon from "../../assets/share.svg"; // Tambahkan icon share
 
 const ProductDetail = () => {
     const { product, reviews, meta, similar_products } = usePage().props;
+    console.log("Reviews:", reviews);
+    console.log("Meta:", meta);
     const productData = product?.data?.product;
     const tenantData = product?.data?.tenant;
     const [searchQuery, setSearchQuery] = useState("");
@@ -237,7 +239,7 @@ const ProductDetail = () => {
                             </div>
                         </div>
 
-                        {reviews && meta && (
+                        {reviews && (
                             <div className="border border-slate-200 rounded-lg p-4 mt-16 mb-16">
                                 <div className="mb-4">
                                     <div className="flex justify-between items-center">
@@ -246,9 +248,8 @@ const ProductDetail = () => {
                                                 Food Review
                                             </p>
                                             <p className="text-gray-500 text-sm">
-                                                Showing {meta?.from} -{" "}
-                                                {meta?.to} Reviews From{" "}
-                                                {meta?.total} Results
+                                                Showing {reviews.data.length}{" "}
+                                                Reviews
                                             </p>
                                         </span>
                                         <button className="px-5 py-4 border border-slate-200 rounded-lg">
@@ -257,13 +258,18 @@ const ProductDetail = () => {
                                     </div>
                                 </div>
                                 <div className="divide-y divide-slate-200">
-                                    {Array.isArray(reviews?.data) &&
+                                    {reviews.data && reviews.data.length > 0 ? (
                                         reviews.data.map((review, index) => (
                                             <ReviewItem
-                                                key={index}
+                                                key={review.id || index}
                                                 review={review}
                                             />
-                                        ))}
+                                        ))
+                                    ) : (
+                                        <p className="text-gray-500 py-4">
+                                            Belum ada review untuk produk ini
+                                        </p>
+                                    )}
                                 </div>
                             </div>
                         )}

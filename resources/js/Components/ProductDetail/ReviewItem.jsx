@@ -1,24 +1,30 @@
 import React from "react";
 
 const ReviewItem = ({ review }) => {
-    review = review.data;
+    console.log("Review data:", review);
+    if (!review) return null;
+
+    // Mengambil data user dan address
+    const user = review.transaction_item?.transaction?.address?.user || {};
+    const address = review.transaction_item?.transaction?.address || {};
+
     return (
         <div className="py-4">
             <div className="flex items-start">
                 <div className="w-10 flex-shrink-0">
                     <img
-                        src={review.photo_url}
+                        src={user.photo_url || "/default-avatar.png"}
                         className="w-10 h-10 rounded-full object-cover"
-                        alt={review.full_name}
+                        alt={user.full_name || "User"}
                     />
                 </div>
 
                 <div className="ml-4 w-[180px] flex-shrink-0">
                     <h3 className="font-semibold truncate">
-                        {review.full_name || "Anonymous"}
+                        {user.full_name || "Anonymous"}
                     </h3>
                     <p className="text-gray-500 text-sm truncate">
-                        {review.city}, {review.state}
+                        {address.city || "-"}, {address.state || "-"}
                     </p>
                 </div>
 
@@ -41,8 +47,12 @@ const ReviewItem = ({ review }) => {
                         ))}
                     </div>
                 </div>
-                <div className="ml-auto text-sm whitespace-nowrap text-black">
-                    {review.created_at}
+                <div className="ml-auto text-sm whitespace-nowrap text-gray-500">
+                    {new Date(review.created_at).toLocaleDateString("id-ID", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                    })}
                 </div>
             </div>
         </div>
