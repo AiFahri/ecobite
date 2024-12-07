@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -29,15 +30,22 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
-        return [
-            ...parent::share($request),
+        Log::info('Current user:', ['user' => $request->user()]);
+        
+        return array_merge(parent::share($request), [
             'auth' => [
-                'user' => $request->user(),
+                'user' => $request->user() ? [
+                    'id' => $request->user()->id,
+                    'name' => $request->user()->name,
+                    'email' => $request->user()->email,
+                    'profile_photo_url' => $request->user()->profile_photo_path 
+                        ? asset('storage/' . $request->user()->profile_photo_path)
+                        : 'https://ui-avatars.com/api/?name=' . urlencode($request->user()->name),
+                ] : null
             ],
             'flash' => [
-                'success' => session('success'),
-                'error' => session('error'),
+                'message' => fn () => $request->session()->get('message')
             ],
-        ];
+        ]);
     }
 }
