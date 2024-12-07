@@ -3,7 +3,10 @@
 namespace App\Http\Middleware;
 
 use Illuminate\Http\Request;
+<<<<<<< HEAD
 use Illuminate\Support\Facades\Log;
+=======
+>>>>>>> a0ea1417d677445d19065936d095f5f33a5ec0e5
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -30,6 +33,7 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+<<<<<<< HEAD
         Log::info('Current user:', ['user' => $request->user()]);
         
         return array_merge(parent::share($request), [
@@ -47,5 +51,17 @@ class HandleInertiaRequests extends Middleware
                 'message' => fn () => $request->session()->get('message')
             ],
         ]);
+=======
+        return [
+            ...parent::share($request),
+            'auth' => [
+                'user' => $request->user(),
+            ],
+            'flash' => [
+                'success' => session('success'),
+                'error' => session('error'),
+            ],
+        ];
+>>>>>>> a0ea1417d677445d19065936d095f5f33a5ec0e5
     }
 }

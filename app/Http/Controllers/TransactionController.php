@@ -9,6 +9,7 @@ use App\Models\Address;
 use App\Models\Product;
 use App\Models\UserVoucher;
 use Illuminate\Support\Facades\Session;
+use Inertia\Inertia;
 use League\Geotools\Coordinate\Coordinate;
 use League\Geotools\Distance\Distance;
 use League\Geotools\Distance\Vincenty;
@@ -53,11 +54,17 @@ class TransactionController extends Controller
             ->where('id', '!=', $address->id)
             ->get();
 
-        return response()->json([
-            'address' => $address,
-            'addresses' => $addresses,
+        // return response()->json([
+        //     'address' => $address,
+        //     'addresses' => $addresses,
+        //     'product' => $product,
+        //     'voucher' => $vouchers,
+        // ]);
+
+        return Inertia::render('Payment', [
             'product' => $product,
-            'voucher' => $vouchers,
+            'quantity' => $product->quantity,
+            'address' => $address
         ]);
     }
 

@@ -15,7 +15,8 @@ import { useState, useEffect } from "react";
 import { usePage, router } from "@inertiajs/react";
 
 const Payment = () => {
-    const { product, quantity, delivery_fee, promo_voucher } = usePage().props;
+    const { address, product, quantity, delivery_fee, promo_voucher } =
+        usePage().props;
     const [selectedAddress, setSelectedAddress] = useState({
         id: "test-address-id",
         address: "Jl. Yos Sudarso, Kec. Dringu, Probolinggo, Jawa",
@@ -34,6 +35,8 @@ const Payment = () => {
             document.head.removeChild(script);
         };
     }, []);
+
+    console.log(product);
 
     // Jika data belum ada, tampilkan loading
     if (!product || !quantity) {
@@ -61,8 +64,7 @@ const Payment = () => {
             {
                 product_id: product.id,
                 quantity: quantity,
-                address_id: selectedAddress.id,
-                voucher_id: voucher ? voucher[0]?.id : null,
+                address_id: address.id,
             },
             {
                 onSuccess: (response) => {
@@ -125,9 +127,8 @@ const Payment = () => {
                                                 <p className="text-gray-400 mr-4">
                                                     Contact
                                                 </p>
-                                                <p>RayGanteng123@gmail.com</p>
+                                                <p>{address.phone_number}</p>
                                             </span>
-                                            <p>Change</p>
                                         </span>
                                     </div>
                                     <div>
@@ -137,8 +138,9 @@ const Payment = () => {
                                                     Address
                                                 </p>
                                                 <p>
-                                                    Jl. Yos Sudarso, Kec.
-                                                    Dringu, Probolinggo, Jawa
+                                                    {address.detailed_address},{" "}
+                                                    {address.city},{" "}
+                                                    {address.state}
                                                 </p>
                                             </span>
                                             <p>Change</p>
@@ -152,7 +154,10 @@ const Payment = () => {
                                 <div className="flex justify-between items-center">
                                     <span className="flex items-center">
                                         <img
-                                            src={product.photo_url}
+                                            src={
+                                                product.product_media[0]
+                                                    .photo_url
+                                            }
                                             alt={product.name}
                                             className="w-16 h-16 object-cover rounded"
                                         />
@@ -168,7 +173,7 @@ const Payment = () => {
                                         <p className="text-xs text-gray-400 text-end">
                                             Total : x{quantity}
                                         </p>
-                                        <p>Rp {basePrice.toLocaleString()}</p>
+                                        <p>Rp {basePrice}</p>
                                     </span>
                                 </div>
                             </div>
@@ -187,27 +192,19 @@ const Payment = () => {
                                             <p className="text-gray-400">
                                                 Item Quantity ({quantity}pcs)
                                             </p>
-                                            <p>
-                                                Rp {basePrice.toLocaleString()}
-                                            </p>
+                                            <p>Rp {basePrice}</p>
                                         </div>
                                         <div className="flex justify-between">
                                             <p className="text-gray-400">
                                                 Delivery (Estimation)
                                             </p>
-                                            <p>
-                                                Rp{" "}
-                                                {delivery_fee.toLocaleString()}
-                                            </p>
+                                            <p>Rp {delivery_fee}</p>
                                         </div>
                                         <div className="flex justify-between">
                                             <p className="text-gray-400">
                                                 Promo Voucher
                                             </p>
-                                            <p>
-                                                Rp{" "}
-                                                {promo_voucher.toLocaleString()}
-                                            </p>
+                                            <p>Rp {promo_voucher}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -215,7 +212,7 @@ const Payment = () => {
                                     <div className="flex justify-between items-baseline">
                                         <p>Total</p>
                                         <p className="text-xl font-semibold">
-                                            Rp {totalPrice.toLocaleString()}
+                                            Rp {totalPrice}
                                         </p>
                                     </div>
                                     <button

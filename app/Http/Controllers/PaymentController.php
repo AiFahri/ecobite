@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use App\Models\Product;
 use Midtrans\Snap;
 use Midtrans\Config;
+use Inertia\Inertia;
 
 class PaymentController extends Controller
 {
@@ -67,13 +68,6 @@ class PaymentController extends Controller
         $transaction->save();
 
         // Lakukan sesuatu dengan data valid
-        return response()->json([
-            'message' => 'success create payment',
-            'data' =>
-            [
-                'transaction_id' => $transaction->id,
-                'snap_token' => $snapToken,
-            ],
-        ]);
+        return Inertia::render('Snap');
     }
 }

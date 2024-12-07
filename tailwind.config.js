@@ -19,7 +19,6 @@ export default {
             fontFamily: {
                 sans: ["Outfit", ...defaultTheme.fontFamily.sans],
                 outfit: ["Outfit", "sans-serif"],
-                lora: ["Lora", "serif"],
             },
         },
     },
