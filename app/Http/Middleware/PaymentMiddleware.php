@@ -16,12 +16,12 @@ class PaymentMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        \Log::info('Payment Middleware Session:', Session::get('instant-buy'));
-        
+        \Log::info('Payment Middleware Session:', Session::get('instant-buy') ?? ['No session']);
+
         if (!Session::has('instant-buy')) {
             return redirect()->route('catalog.index');
         }
-        
+
         return $next($request);
     }
 }

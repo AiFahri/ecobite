@@ -18,6 +18,25 @@ class TransactionController extends Controller
 {
     //
 
+    public function index()
+    {
+        $transactions = \App\Models\Transaction::query()
+            ->with([
+                'transactionItems.product.productType',
+                'transactionItems.product.productMedia',
+                'transactionItems.product.tenant',
+                'address.user'
+            ])
+            ->whereHas('address.user', function ($query) {
+                $query->where('id', Auth::id());
+            })
+            ->paginate(5);
+
+        return Inertia::render('Transactions', [
+            'transactions' => $transactions
+        ]);
+    }
+
     public function showInstantBuy()
     {
 

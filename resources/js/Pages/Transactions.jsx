@@ -7,6 +7,7 @@ import BookmarkIcon from "../../assets/solar_bookmark-linear.svg";
 import BookmarkFilledIcon from "../../assets/solar_bookmark-bold.svg";
 import ProductFilter from "@/Components/Catalog/ProductFilter";
 import Rectangle6802_1 from "../../assets/img/Rectangle 6802 (1).png";
+import { usePage, router } from "@inertiajs/react";
 
 // Import gambar-gambar
 import RefreshIcon from "../../assets/assets/refresh.svg";
@@ -14,7 +15,10 @@ import SearchIcon from "../../assets/assets/search.svg";
 import DeleteIcon from "../../assets/assets/delete.svg";
 
 const Transaction = () => {
+    const {transactions} = usePage().props;
     const [searchQuery, setSearchQuery] = useState("");
+
+    console.log(transactions);
 
     // Data dummy yang disesuaikan
     const dummyTransactions = [
@@ -115,20 +119,20 @@ const Transaction = () => {
                             </div>
 
                             <div className="divide-y">
-                                {dummyTransactions.map((transaction) => (
+                                {transactions.data.map((transaction) => (
                                     <div key={transaction.id} className="p-4">
                                         {/* Tenant Info */}
                                         <div className="flex items-center gap-2 mb-4">
                                             <span className="font-medium">
-                                                {transaction.tenant}
+                                                {transaction.transaction_items[0].product.tenant.name}
                                             </span>
-                                            {transaction.isVerified && (
+                                            {transaction.transaction_items[0].product.tenant.is_verified && (
                                                 <span className="bg-blue-100 text-blue-600 text-xs px-2 py-1 rounded-full">
                                                     Verified
                                                 </span>
                                             )}
                                             <span className="text-gray-500 text-sm">
-                                                {transaction.date}
+                                                {transaction.created_at}
                                             </span>
                                             <span className="text-green-600 text-sm bg-green-50 px-2 py-1 rounded-full">
                                                 {transaction.status}
@@ -140,11 +144,10 @@ const Transaction = () => {
                                             <div className="flex-1 flex">
                                                 <img
                                                     src={
-                                                        transaction.product
-                                                            .image
+                                                        transaction.transaction_items[0].product.product_media[0].photo_url
                                                     }
                                                     alt={
-                                                        transaction.product.name
+                                                        transaction.transaction_items[0].product.name
                                                     }
                                                     className="w-20 h-20 object-cover rounded-lg mr-4"
                                                 />
@@ -153,16 +156,12 @@ const Transaction = () => {
                                                         <div>
                                                             <span className="text-sm text-gray-500">
                                                                 {
-                                                                    transaction
-                                                                        .product
-                                                                        .category
+                                                                    transaction.transaction_items[0].product.product_type.name
                                                                 }
                                                             </span>
                                                             <h3 className="text-lg font-medium">
                                                                 {
-                                                                    transaction
-                                                                        .product
-                                                                        .name
+                                                                    transaction.transaction_items[0].product.name
                                                                 }
                                                             </h3>
                                                         </div>
@@ -172,7 +171,7 @@ const Transaction = () => {
                                                             </p>
                                                             <p className="font-semibold">
                                                                 Rp{" "}
-                                                                {transaction.product.price.toLocaleString()}
+                                                                {transaction.total.toLocaleString()}
                                                             </p>
                                                             <div className="flex gap-2 mt-2">
                                                                 <button className="text-gray-600 text-sm hover:text-gray-800">
@@ -187,15 +186,12 @@ const Transaction = () => {
                                                     </div>
                                                     <p className="text-sm text-gray-600 mt-2">
                                                         {
-                                                            transaction.product
-                                                                .quantity
+                                                            transaction.transaction_items[0].quantity
                                                         }{" "}
                                                         items x Rp{" "}
                                                         {(
-                                                            transaction.product
-                                                                .price /
-                                                            transaction.product
-                                                                .quantity
+                                                            transaction.transaction_items[0].discount_price /
+                                                            transaction.transaction_items[0].quantity
                                                         ).toLocaleString()}
                                                     </p>
                                                 </div>

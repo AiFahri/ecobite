@@ -19,6 +19,11 @@ class Transaction extends Model
         'address_id',
     ];
 
+    public function transactionItems()
+    {
+        return $this->hasMany(TransactionItem::class);
+    }
+
     public function address()
     {
         return $this->belongsTo(Address::class, 'address_id'); // Foreign key: address_id

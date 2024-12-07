@@ -19,7 +19,7 @@ const Navbar = (isLoggedIn) => {
                             <a href="/wishlist">Wishlist</a>
                         </li>
                         <li className="text-slate-500 hover:text-slate-900 hover:underline hover:underline-offset-2">
-                            <a href="/carts">Transaction</a>
+                            <a href="/transactions">Transaction</a>
                         </li>
                     </ul>
                     <a href="/login">
