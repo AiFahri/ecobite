@@ -38,7 +38,7 @@ class AuthenticatedSessionController extends Controller
         $request->session()->regenerate();
         Log::info('Session regenerated: ' . session()->getId());
 
-        return redirect()->intended(route('dashboard'));
+        return redirect()->intended(route('catalog.index'));
     }
 
     /**
@@ -52,6 +52,6 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        return redirect('/login');
     }
 }

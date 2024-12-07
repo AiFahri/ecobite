@@ -31,9 +31,9 @@ const ProductCard = ({ product, isWishlist = false, onToggleWishlist }) => {
                     preserveScroll: true,
                     onSuccess: (response) => {
                         setIsWishlisted(!isWishlisted);
-                        if (onToggleWishlist) {
-                            onToggleWishlist();
-                        }
+                        // if (onToggleWishlist) {
+                        //     onToggleWishlist();
+                        // }
                     },
                     onError: (errors) => {
                         // Handle error - misalnya user belum login

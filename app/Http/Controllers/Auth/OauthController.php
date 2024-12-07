@@ -39,7 +39,7 @@ class OauthController extends Controller
             // Login user
             Auth::login($user);
 
-            return redirect(route('dashboard', absolute: false));
+            return redirect()->intended(route('catalog.index'));
         } catch (Exception $e) {
 
             dd($e);
@@ -75,7 +75,7 @@ class OauthController extends Controller
             // Login user
             Auth::login($user);
 
-            return redirect(route('dashboard', absolute: false));
+            return redirect()->intended(route('catalog.index'));
         } catch (Exception $e) {
 
             dd($e);

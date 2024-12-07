@@ -53,6 +53,6 @@ class RegisteredUserController extends Controller
         Log::info('id: ' . json_encode(Auth::id()));
         Log::info('id: ' . json_encode(Auth::check()));
 
-        return redirect(route('dashboard', absolute: false));
+        return redirect()->intended(route('catalog.index'));
     }
 }

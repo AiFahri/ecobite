@@ -15,8 +15,8 @@ import { useState, useEffect } from "react";
 import { usePage, router } from "@inertiajs/react";
 
 const Payment = () => {
-    const { address, product, quantity, delivery_fee, promo_voucher } =
-        usePage().props;
+    const { flash } = usePage().props;
+    const { address, product, quantity, delivery_fee, promo_voucher } = usePage().props;
     const [selectedAddress, setSelectedAddress] = useState({
         id: "test-address-id",
         address: "Jl. Yos Sudarso, Kec. Dringu, Probolinggo, Jawa",
@@ -35,6 +35,15 @@ const Payment = () => {
             document.head.removeChild(script);
         };
     }, []);
+
+    useEffect(() => {
+        if (flash?.success) {
+            console.log("Snap Token:", flash.success);
+        }
+        if (flash?.error) {
+            console.log("Payment Error Message:", flash.error);
+        }
+    }, [flash]);
 
     console.log(product);
 
@@ -68,11 +77,12 @@ const Payment = () => {
             },
             {
                 onSuccess: (response) => {
-                    const snapToken = response.data.snap_token;
+                    console.log(response.props.flash);
+                    const snapToken = response.props.flash.success;
                     window.snap.pay(snapToken, {
                         onSuccess: function (result) {
                             console.log("Payment success:", result);
-                            router.visit("/dashboard");
+                            // router.visit("/dashboard");
                         },
                         onPending: function (result) {
                             console.log("Payment pending:", result);

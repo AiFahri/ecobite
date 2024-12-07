@@ -22,7 +22,22 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withMiddleware(function (Middleware $middleware) {
-        $middleware->alias(['payment' => \App\Http\Middleware\PaymentMiddleware::class]);
+
+        $middleware->alias([
+            'guest' => function ($request, $next) {
+                if (Auth::check()) {
+                    return redirect()->route('catalog.index');
+                }
+                return $next($request);
+            },
+            'auth' => function ($request, $next) {
+                if (!Auth::check()) {
+                    return redirect()->route('login');
+                }
+                return $next($request);
+            },
+            'payment' => \App\Http\Middleware\PaymentMiddleware::class
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

@@ -43,6 +43,8 @@ const ProductDetail = () => {
     const mainPhoto = productData?.photo_urls?.[0] || "";
     const additionalPhotos = productData?.photo_urls?.slice(1) || [];
 
+    console.log('total reviews: ' + reviews);
+
     const handleSearch = (e) => {
         setSearchQuery(e.target.value);
     };
@@ -248,8 +250,8 @@ const ProductDetail = () => {
                                                 Food Review
                                             </p>
                                             <p className="text-gray-500 text-sm">
-                                                Showing {reviews.data.length}{" "}
-                                                Reviews
+                                                Showing {reviews.meta.from}{"-"}{reviews.meta.to}{" "}
+                                                Reviews From {reviews.meta.total}{" "} Results
                                             </p>
                                         </span>
                                         <button className="px-5 py-4 border border-slate-200 rounded-lg">

@@ -42,7 +42,7 @@ const Login = () => {
             {
                 onSuccess: () => {
                     console.log("Login berhasil");
-                    router.visit("/dashboard");
+                    // router.visit("/catalog");
                 },
                 onError: (errors) => {
                     setErrors(errors);

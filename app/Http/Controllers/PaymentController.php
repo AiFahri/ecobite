@@ -64,10 +64,16 @@ class PaymentController extends Controller
 
         $snapToken = Snap::getSnapToken($params);
 
-        $transaction->token = $snapToken;
-        $transaction->save();
+        try {
+            // Generate Snap token
+            $snapToken = Snap::getSnapToken($params);
 
-        // Lakukan sesuatu dengan data valid
-        return Inertia::render('Snap');
+            $transaction->token = $snapToken;
+            $transaction->save();
+
+            return redirect()->back()->with('success', $snapToken);
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to proccess payment');
+        }
     }
 }

@@ -119,27 +119,16 @@ class WishlistController extends Controller
         try {
             if ($wishlist) {
                 $wishlist->delete();
-                return response()->json([
-                    'status' => 'success',
-                    'message' => 'Product removed from wishlist',
-                    'is_wishlisted' => false
-                ]);
+                return redirect()->back()->with('success', 'Product removed from wishlist');
             } else {
                 Wishlist::create([
                     'user_id' => $user->id,
                     'product_id' => $productId,
                 ]);
-                return response()->json([
-                    'status' => 'success',
-                    'message' => 'Product added to wishlist',
-                    'is_wishlisted' => true
-                ]);
+                return redirect()->back()->with('success', 'Product added to wishlist');
             }
         } catch (\Exception $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Failed to toggle wishlist'
-            ], 500);
+            return redirect()->back()->with('error', 'Failed to toggle wishlist');
         }
     }
 }
