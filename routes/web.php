@@ -8,7 +8,6 @@ use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\WishlistController;
-
 Route::get('/', function () {
     return Inertia::render('Home');
 });
@@ -31,6 +30,8 @@ Route::middleware(['auth'])->group(function () {
 Route::get('/products', [CatalogController::class, 'index'])->name('products.index');
 Route::get('/payment', [PaymentController::class, 'index'])->name('payment.index');
 
+Route::get('/products/{productID}', [CatalogController::class, 'show'])->name('products.show');
+
 Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('login.post');
 
 Route::get('instant-buy', [TransactionController::class, 'showInstantBuy'])->middleware('payment')->name('instant-buy');
@@ -39,6 +40,14 @@ Route::post('instant-buy', [TransactionController::class, 'storeInstantBuy']);
 
 Route::get('/carts', function () {
     return Inertia::render('Cart');
+});
+
+Route::get('/admin/superadmin', function () {
+    return Inertia::render('Admin/SuperAdmin');
+});
+
+Route::get('/map', function () {
+    return Inertia::render('Map');
 });
 
 // Route::get('/pre', function () {

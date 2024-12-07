@@ -1,5 +1,4 @@
 import Logo from "../../assets/Logo.png";
-
 const Navbar = (isLoggedIn) => {
     return (
         <section id="navbar" className="h-[10vh] py-2 font-outfit">
@@ -33,5 +32,4 @@ const Navbar = (isLoggedIn) => {
         </section>
     );
 };
-
 export default Navbar;

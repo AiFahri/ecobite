@@ -15,7 +15,8 @@ import { useState, useEffect } from "react";
 import { usePage, router } from "@inertiajs/react";
 
 const Payment = () => {
-    const { address, product, quantity, delivery_fee, promo_voucher } = usePage().props;
+    const { address, product, quantity, delivery_fee, promo_voucher } =
+        usePage().props;
     const [selectedAddress, setSelectedAddress] = useState({
         id: "test-address-id",
         address: "Jl. Yos Sudarso, Kec. Dringu, Probolinggo, Jawa",
@@ -136,7 +137,11 @@ const Payment = () => {
                                                 <p className="text-gray-400 mr-4">
                                                     Address
                                                 </p>
-                                                <p>{address.detailed_address}, {address.city}, {address.state}</p>
+                                                <p>
+                                                    {address.detailed_address},{" "}
+                                                    {address.city},{" "}
+                                                    {address.state}
+                                                </p>
                                             </span>
                                             <p>Change</p>
                                         </span>
@@ -149,7 +154,10 @@ const Payment = () => {
                                 <div className="flex justify-between items-center">
                                     <span className="flex items-center">
                                         <img
-                                            src={product.product_media[0].photo_url}
+                                            src={
+                                                product.product_media[0]
+                                                    .photo_url
+                                            }
                                             alt={product.name}
                                             className="w-16 h-16 object-cover rounded"
                                         />
@@ -184,27 +192,19 @@ const Payment = () => {
                                             <p className="text-gray-400">
                                                 Item Quantity ({quantity}pcs)
                                             </p>
-                                            <p>
-                                                Rp {basePrice}
-                                            </p>
+                                            <p>Rp {basePrice}</p>
                                         </div>
                                         <div className="flex justify-between">
                                             <p className="text-gray-400">
                                                 Delivery (Estimation)
                                             </p>
-                                            <p>
-                                                Rp{" "}
-                                                {delivery_fee}
-                                            </p>
+                                            <p>Rp {delivery_fee}</p>
                                         </div>
                                         <div className="flex justify-between">
                                             <p className="text-gray-400">
                                                 Promo Voucher
                                             </p>
-                                            <p>
-                                                Rp{" "}
-                                                {promo_voucher}
-                                            </p>
+                                            <p>Rp {promo_voucher}</p>
                                         </div>
                                     </div>
                                 </div>
