@@ -8,9 +8,8 @@ use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\WishlistController;
-Route::get('/', function () {
-    return Inertia::render('Home');
-});
+use App\Http\Controllers\HomeController;
+Route::get('/', [HomeController::class, 'index'])->name('home');
 
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', function () {
@@ -25,6 +24,14 @@ Route::middleware(['auth'])->group(function () {
     // Wishlist routes
     Route::get('/wishlist', [WishlistController::class, 'show'])->name('wishlist.show');
     Route::post('/wishlist/toggle', [WishlistController::class, 'toggleWishlist'])->name('wishlist.toggle');
+
+    // Cart routes
+    Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+    Route::post('/cart/add', [CartController::class, 'addToCart'])->name('cart.add');
+    Route::post('/cart/update/{cartId}', [CartController::class, 'updateQuantity'])->name('cart.update');
+    Route::delete('/cart/remove/{cartId}', [CartController::class, 'removeItem'])->name('cart.remove');
+    Route::delete('/cart/remove-all', [CartController::class, 'removeAll'])->name('cart.removeAll');
+    Route::post('/cart/toggle-wishlist/{productId}', [CartController::class, 'toggleWishlist'])->name('cart.toggleWishlist');
 });
 
 Route::get('/products', [CatalogController::class, 'index'])->name('products.index');
@@ -38,9 +45,10 @@ Route::get('instant-buy', [TransactionController::class, 'showInstantBuy'])->mid
 
 Route::post('instant-buy', [TransactionController::class, 'storeInstantBuy']);
 
-Route::get('/carts', function () {
-    return Inertia::render('Cart');
+Route::get('/transaction', function () {
+    return Inertia::render('Transaction');
 });
+
 
 Route::get('/admin/superadmin', function () {
     return Inertia::render('Admin/SuperAdmin');
@@ -49,6 +57,7 @@ Route::get('/admin/superadmin', function () {
 Route::get('/map', function () {
     return Inertia::render('Map');
 });
+
 
 // Route::get('/pre', function () {
 //     // dd(Auth::id());

@@ -41,10 +41,24 @@ const PriceDetail = ({ product }) => {
     };
 
     const handleAddToCart = () => {
-        router.visit(`/cart?product_id=${product.id}&quantity=${quantity}`, {
-            preserveState: true,
-            preserveScroll: true,
-        });
+        router.post(
+            "/cart/add",
+            {
+                product_id: product.id,
+                quantity: quantity,
+            },
+            {
+                onSuccess: () => {
+                    // Optional: Tambahkan notifikasi sukses
+                    alert("Product added to cart successfully!");
+                },
+                onError: (errors) => {
+                    if (errors?.message === "Unauthenticated.") {
+                        window.location.href = "/login";
+                    }
+                },
+            }
+        );
     };
 
     return (
@@ -156,13 +170,22 @@ const PriceDetail = ({ product }) => {
                         </span>
                     </div>
                 </div>
-                <button
-                    onClick={handleBuyNow}
-                    className="w-full py-3 bg-[#A1E870] rounded-lg font-semibold"
-                    disabled={quantity < 1 || product.stocks === 0}
-                >
-                    Buy Now
-                </button>
+                <span className="mt-4 grid grid-cols-2 gap-6">
+                    <button
+                        onClick={handleBuyNow}
+                        className="w-full py-3 bg-[#A1E870] rounded-lg font-semibold"
+                        disabled={quantity < 1 || product.stocks === 0}
+                    >
+                        Buy Now
+                    </button>
+
+                    <button
+                        onClick={handleAddToCart}
+                        className="border border-[#A1E870] rounded-lg px-5 py-3 w-full"
+                    >
+                        Add to Cart
+                    </button>
+                </span>
             </div>
         </div>
     );

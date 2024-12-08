@@ -24,7 +24,34 @@ class PaymentController extends Controller
         Config::$is3ds = config('midtrans.is_3ds');
     }
 
-    public function index() {}
+    public function index(Request $request)
+    {
+        $user = auth()->user();
+        $auth = null;
+        if ($user) {
+            $auth = [
+                'id' => $user->id,
+                'full_name' => $user->full_name,
+                'email' => $user->email,
+                'photo_url' => $user->photo_url,
+            ];
+        }
+
+        $address = $request->address;
+        $product = $request->product;
+        $quantity = $request->quantity;
+        $delivery_fee = $request->delivery_fee;
+        $promo_voucher = $request->promo_voucher;
+
+        return Inertia::render('Payment', [
+            'auth' => $auth,
+            'address' => $address,
+            'product' => $product,
+            'quantity' => $quantity,
+            'delivery_fee' => $delivery_fee,
+            'promo_voucher' => $promo_voucher,
+        ]);
+    }
 
     public function store(PaymentRequest $request)
     {

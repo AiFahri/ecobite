@@ -15,6 +15,7 @@ class Product extends Model
         'name',
         'price',
         'quantity',
+        'category_id'
     ];
 
     public function transactionItems()
@@ -42,17 +43,22 @@ class Product extends Model
         return $this->hasMany(Wishlist::class, 'product_id', 'id');
     }
 
+    public function category()
+    {
+        return $this->belongsTo(Category::class, 'category_id');
+    }
+
     public function getAuthIdentifier()
     {
-        return $this->id; // Misalnya, jika kolom ULID di model adalah `ulid`
+        return $this->id;
     }
 
     public function getInWishlistAttribute()
     {
-        $userId = Auth::id(); // Mendapatkan ID user yang login
+        $userId = Auth::id();
 
         if (!$userId) {
-            return false; // Jika tidak ada user login, kembalikan false
+            return false;
         }
 
         return $this->wishlists->where('user_id', $userId)->isNotEmpty();
@@ -61,12 +67,12 @@ class Product extends Model
     public function ratings()
     {
         return $this->hasManyThrough(
-            TransactionItemRating::class, // Target model
-            TransactionItem::class,      // Intermediate model
-            'product_id',                // Foreign key on TransactionItem
-            'transaction_item_id',       // Foreign key on TransactionItemRating
-            'id',                        // Local key on Product
-            'id'                         // Local key on TransactionItem
+            TransactionItemRating::class,
+            TransactionItem::class,
+            'product_id',
+            'transaction_item_id',
+            'id',
+            'id'
         );
     }
 }

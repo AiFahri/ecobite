@@ -16,7 +16,15 @@ class WishlistController extends Controller
     public function show(Request $request)
     {
         $user = auth()->user();
-
+        $auth = null;
+        if ($user) {
+            $auth = [
+                'id' => $user->id,
+                'full_name' => $user->full_name,
+                'email' => $user->email,
+                'photo_url' => $user->photo_url,
+            ];
+        }
         $wishlists = Wishlist::where('user_id', $user->id)
             ->with(['product' => function ($query) {
                 $query->with(['tenant', 'productMedia', 'productType'])
@@ -100,6 +108,7 @@ class WishlistController extends Controller
             'productTypes' => $productTypes,
             'tenantTypes' => $tenantTypes,
             'starCount' => $starCount,
+            'auth' => $auth,
         ]);
     }
 

@@ -27,6 +27,9 @@ import ProductCard from "@/Components/Catalog/ProductCard";
 import SearchBar from "@/Components/Catalog/SearchBar";
 
 const Catalog = () => {
+    const props = usePage().props;
+    console.log("Full props:", props);
+
     const {
         products,
         productTypes,
@@ -34,7 +37,10 @@ const Catalog = () => {
         starCount,
         filters = {},
         wishlists = [],
-    } = usePage().props;
+        auth,
+    } = props;
+
+    console.log("Auth after destructuring:", auth);
 
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedType, setSelectedType] = useState("");
@@ -108,7 +114,7 @@ const Catalog = () => {
         <>
             <div className="overflow-y-scroll no-scrollbar">
                 <div className="container max-w-screen-xl mx-auto font-outfit">
-                    <Navbar />
+                    <Navbar auth={auth} />
                 </div>
                 <section>
                     <div className="max-w-screen-xl mx-auto font-outfit">

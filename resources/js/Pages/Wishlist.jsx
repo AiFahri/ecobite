@@ -14,6 +14,7 @@ const Wishlist = () => {
         tenantTypes = [],
         starCount = [],
         filters = {},
+        auth,
     } = usePage().props;
     const [searchQuery, setSearchQuery] = React.useState("");
     const [filteredProducts, setFilteredProducts] = React.useState(
@@ -54,7 +55,7 @@ const Wishlist = () => {
 
             <div className="flex flex-col min-h-screen">
                 <div className="container max-w-screen-xl mx-auto">
-                    <Navbar />
+                    <Navbar auth={auth} />
                 </div>
 
                 <div className="flex-1">
