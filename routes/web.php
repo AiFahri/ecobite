@@ -8,9 +8,8 @@ use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\WishlistController;
-Route::get('/', function () {
-    return Inertia::render('Home');
-});
+use App\Http\Controllers\HomeController;
+Route::get('/', [HomeController::class, 'index'])->name('home');
 
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', function () {
@@ -49,6 +48,7 @@ Route::get('/admin/superadmin', function () {
 Route::get('/map', function () {
     return Inertia::render('Map');
 });
+
 
 // Route::get('/pre', function () {
 //     // dd(Auth::id());

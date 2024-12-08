@@ -29,6 +29,16 @@ class CartController extends Controller
                 'quantity' => $request->quantity
             ]
         );
+        $user = auth()->user();
+        $auth = null;
+        if ($user) {
+            $auth = [
+                'id' => $user->id,
+                'full_name' => $user->full_name,
+                'email' => $user->email,
+                'photo_url' => $user->photo_url,
+            ];
+        }
 
         $product = Product::with(['productMedia', 'tenant'])->findOrFail($request->product_id);
 
@@ -47,6 +57,7 @@ class CartController extends Controller
             'quantity' => (int) $request->quantity,
             'delivery_fee' => 10000,
             'promo_voucher' => 10000,
+            'auth' => $auth,
         ]);
     }
 }

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { usePage } from "@inertiajs/react";
 import Navbar from "@/Components/Navbar";
 import Footer from "@/Components/Footer";
 import SimilarSection from "@/Components/ProductDetail/SimilarSection";
@@ -14,6 +15,7 @@ import SearchIcon from "../../assets/assets/search.svg";
 import DeleteIcon from "../../assets/assets/delete.svg";
 
 const Transaction = () => {
+    const { auth } = usePage().props;
     const [searchQuery, setSearchQuery] = useState("");
 
     // Data dummy yang disesuaikan
@@ -74,7 +76,7 @@ const Transaction = () => {
 
     return (
         <div className="overflow-y-scroll no-scrollbar">
-            <Navbar />
+            <Navbar auth={auth} />
 
             <div className="container max-w-screen-xl mx-auto font-outfit">
                 {/* Breadcrumb & Title */}

@@ -3,10 +3,6 @@
 namespace App\Http\Middleware;
 
 use Illuminate\Http\Request;
-<<<<<<< HEAD
-use Illuminate\Support\Facades\Log;
-=======
->>>>>>> a0ea1417d677445d19065936d095f5f33a5ec0e5
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -33,35 +29,19 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
-<<<<<<< HEAD
-        Log::info('Current user:', ['user' => $request->user()]);
-        
         return array_merge(parent::share($request), [
-            'auth' => [
-                'user' => $request->user() ? [
-                    'id' => $request->user()->id,
-                    'name' => $request->user()->name,
-                    'email' => $request->user()->email,
-                    'profile_photo_url' => $request->user()->profile_photo_path 
-                        ? asset('storage/' . $request->user()->profile_photo_path)
-                        : 'https://ui-avatars.com/api/?name=' . urlencode($request->user()->name),
-                ] : null
-            ],
+            'auth' => function () use ($request) {
+                $user = $request->user();
+                return $user ? [
+                    'id' => $user->id,
+                    'full_name' => $user->full_name,
+                    'email' => $user->email,
+                    'photo_url' => $user->photo_url,
+                ] : null;
+            },
             'flash' => [
                 'message' => fn () => $request->session()->get('message')
             ],
         ]);
-=======
-        return [
-            ...parent::share($request),
-            'auth' => [
-                'user' => $request->user(),
-            ],
-            'flash' => [
-                'success' => session('success'),
-                'error' => session('error'),
-            ],
-        ];
->>>>>>> a0ea1417d677445d19065936d095f5f33a5ec0e5
     }
 }
