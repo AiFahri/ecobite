@@ -24,6 +24,6 @@
     </head>
     <body class="font-sans antialiased">
         @inertia
-        <p class="text-red-500">Hello</p>
+      
     </body>
 </html>

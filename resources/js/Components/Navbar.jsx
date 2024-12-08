@@ -46,8 +46,11 @@ const Navbar = ({ auth }) => {
                         <li className="mr-14 text-slate-500 hover:text-slate-900 hover:underline hover:underline-offset-2">
                             <Link href="/wishlist">Wishlist</Link>
                         </li>
+                        <li className="mr-14 text-slate-500 hover:text-slate-900 hover:underline hover:underline-offset-2">
+                            <Link href="/transaction">Transaction</Link>
+                        </li>
                         <li className="text-slate-500 hover:text-slate-900 hover:underline hover:underline-offset-2">
-                            <Link href="/carts">Transaction</Link>
+                            <Link href="/cart">Cart</Link>
                         </li>
                     </ul>
                     {auth ? (
