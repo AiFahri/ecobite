@@ -18,8 +18,8 @@ import Frame237996 from "../../assets/Frame 237996.png";
 import { usePage, router } from "@inertiajs/react";
 
 const Cart = () => {
-    const {cartItems, auth} = usePage().props;
-    console.log(cartItems);
+    const {cartItems, auth, similar_products} = usePage().props;
+    console.log(similar_products);
     const [searchQuery, setSearchQuery] = useState("");
     const [selectAll, setSelectAll] = useState(false);
 
@@ -230,7 +230,7 @@ const Cart = () => {
             <section className="hero-7">
                 <div className="container max-w-screen-xl mx-auto font-outfit">
                     <div className="grid grid-cols-4 gap-6">
-                        {similarProducts.map((product) => (
+                        {similar_products.map((product) => (
                             <div
                                 key={product.id}
                                 className="border border-slate-400 flex flex-col p-4 rounded-lg mt-10"
@@ -240,14 +240,14 @@ const Cart = () => {
                                         5% Discount
                                     </button>
                                     <img
-                                        src={product.image}
+                                        src={product.photo_urls[0]}
                                         className="w-full"
-                                        alt={product.title}
+                                        alt={product.name}
                                     />
                                 </span>
                                 <span className="flex justify-between items-center mt-4">
                                     <p className="font-semibold text-xl">
-                                        {product.title}
+                                        {product.name}
                                     </p>
                                     <img
                                         src={BookmarkIcon}
@@ -277,12 +277,12 @@ const Cart = () => {
                                     <span className="flex items-baseline">
                                         <p className="text-xs mr-2">Rp</p>
                                         <p className="text-xl font-bold mr-3">
-                                            {product.price}
+                                            {product.discount_price.toLocaleString()}
                                         </p>
                                     </span>
                                     <span className="relative">
                                         <p className="text-md text-red-500">
-                                            Rp {product.originalPrice}
+                                            Rp {product.price.toLocaleString()}
                                         </p>
                                         <div className="absolute top-1/2 border border-black w-full"></div>
                                     </span>

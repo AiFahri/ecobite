@@ -15,7 +15,9 @@ import SearchIcon from "../../assets/assets/search.svg";
 import DeleteIcon from "../../assets/assets/delete.svg";
 
 const Transactions = () => {
-    const { auth } = usePage().props;
+    const { auth, transactions } = usePage().props;
+
+    console.log(transactions);
     const [searchQuery, setSearchQuery] = useState("");
 
     // Data dummy yang disesuaikan
@@ -117,20 +119,20 @@ const Transactions = () => {
                             </div>
 
                             <div className="divide-y">
-                                {dummyTransactions.map((transaction) => (
+                                {transactions.data.map((transaction) => (
                                     <div key={transaction.id} className="p-4">
                                         {/* Tenant Info */}
                                         <div className="flex items-center gap-2 mb-4">
                                             <span className="font-medium">
-                                                {transaction.tenant}
+                                                {transaction.transaction_items[0].product.tenant.name}
                                             </span>
-                                            {transaction.isVerified && (
+                                            {transaction.transaction_items[0].product.tenant.is_verified && (
                                                 <span className="bg-blue-100 text-blue-600 text-xs px-2 py-1 rounded-full">
                                                     Verified
                                                 </span>
                                             )}
                                             <span className="text-gray-500 text-sm">
-                                                {transaction.date}
+                                                {transaction.created_at}
                                             </span>
                                             <span className="text-green-600 text-sm bg-green-50 px-2 py-1 rounded-full">
                                                 {transaction.status}
@@ -142,11 +144,10 @@ const Transactions = () => {
                                             <div className="flex-1 flex">
                                                 <img
                                                     src={
-                                                        transaction.product
-                                                            .image
+                                                        transaction.transaction_items[0].product.product_media[0].photo_url
                                                     }
                                                     alt={
-                                                        transaction.product.name
+                                                        transaction.transaction_items[0].product.name
                                                     }
                                                     className="w-20 h-20 object-cover rounded-lg mr-4"
                                                 />
@@ -155,16 +156,12 @@ const Transactions = () => {
                                                         <div>
                                                             <span className="text-sm text-gray-500">
                                                                 {
-                                                                    transaction
-                                                                        .product
-                                                                        .category
+                                                                    transaction.transaction_items[0].product.product_type.name
                                                                 }
                                                             </span>
                                                             <h3 className="text-lg font-medium">
                                                                 {
-                                                                    transaction
-                                                                        .product
-                                                                        .name
+                                                                    transaction.transaction_items[0].product.name
                                                                 }
                                                             </h3>
                                                         </div>
@@ -174,7 +171,7 @@ const Transactions = () => {
                                                             </p>
                                                             <p className="font-semibold">
                                                                 Rp{" "}
-                                                                {transaction.product.price.toLocaleString()}
+                                                                {transaction.transaction_items[0].product.price.toLocaleString()}
                                                             </p>
                                                             <div className="flex gap-2 mt-2">
                                                                 <button className="text-gray-600 text-sm hover:text-gray-800">
@@ -187,17 +184,15 @@ const Transactions = () => {
                                                             </div>
                                                         </div>
                                                     </div>
+                                                    Total:
                                                     <p className="text-sm text-gray-600 mt-2">
                                                         {
-                                                            transaction.product
-                                                                .quantity
+                                                            transaction.transaction_items[0].quantity
                                                         }{" "}
                                                         items x Rp{" "}
                                                         {(
-                                                            transaction.product
-                                                                .price /
-                                                            transaction.product
-                                                                .quantity
+                                                            transaction.transaction_items[0].product.price /
+                                                                transaction.transaction_items[0].product.stocks
                                                         ).toLocaleString()}
                                                     </p>
                                                 </div>

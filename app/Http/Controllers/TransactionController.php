@@ -30,6 +30,7 @@ class TransactionController extends Controller
             ->whereHas('address.user', function ($query) {
                 $query->where('id', Auth::id());
             })
+            ->orderBy('created_at', 'desc')
             ->paginate(5);
 
         return Inertia::render('Transactions', [
