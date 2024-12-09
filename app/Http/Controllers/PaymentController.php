@@ -11,6 +11,7 @@ use App\Models\Product;
 use Midtrans\Snap;
 use Midtrans\Config;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Auth;
 
 class PaymentController extends Controller
 {
@@ -18,6 +19,8 @@ class PaymentController extends Controller
 
     public function __construct()
     {
+      
+    
         Config::$serverKey = config('midtrans.server_key');
         Config::$isProduction = config('midtrans.is_production');
         Config::$isSanitized = config('midtrans.is_sanitized');
@@ -53,54 +56,78 @@ class PaymentController extends Controller
         ]);
     }
 
-    public function store(PaymentRequest $request)
+    public function store(Request $request)
     {
-
-        $request->validated();
-
-        $product = Product::find($request['product_id']);
-        $total = $product->discount_price * $request['quantity'];
-
-        $transactionId = (string) \Illuminate\Support\Str::ulid();
-        $transaction = Transaction::create([
-            'id' => $transactionId,
-            'total' => $total,
-            'status' => 'waiting-for-payment',
-            'payment_type' => null,
-            'token' => '',
-            'created_at' => now(),
-            'updated_at' => now(),
-            'address_id' => $request->address_id,
-        ]);
-
-        TransactionItem::create([
-            'id' => (string) \Illuminate\Support\Str::ulid(),
-            'quantity' => $request['quantity'],
-            'price' => $product->price * $product['quantity'],
-            'discount_price' => $product->discount_price * $product['quantity'],
-            'product_id' => $product['id'],
-            'transaction_id' => $transactionId,
-        ]);
-
-        $params = [
-            'transaction_details' => [
-                'order_id' => $transaction->id,
-                'gross_amount' => $transaction->total,
-            ],
-        ];
-
-        $snapToken = Snap::getSnapToken($params);
-
         try {
-            // Generate Snap token
-            $snapToken = Snap::getSnapToken($params);
+            $request->validate([
+                'products' => 'required|array',
+                'products.*.product_id' => 'required|exists:products,id',
+                'products.*.quantity' => 'required|integer|min:1',
+                'address_id' => 'required|exists:addresses,id',
+                'delivery_fee' => 'required|numeric',
+                'promo_voucher' => 'required|numeric'
+            ]);
 
-            $transaction->token = $snapToken;
+            $total = 0;
+            $transactionId = (string) \Illuminate\Support\Str::ulid();
+            
+            // Create transaction
+            $transaction = Transaction::create([
+                'id' => $transactionId,
+                'status' => 'waiting-for-payment',
+                'payment_type' => null,
+                'token' => '',
+                'address_id' => $request->address_id,
+                'delivery_fee' => $request->delivery_fee,
+                'promo_voucher' => $request->promo_voucher,
+            ]);
+
+            // Create transaction items
+            foreach ($request->products as $item) {
+                $product = Product::find($item['product_id']);
+                $subtotal = $product->price * $item['quantity'];
+                $total += $subtotal;
+
+                TransactionItem::create([
+                    'id' => (string) \Illuminate\Support\Str::ulid(),
+                    'quantity' => $item['quantity'],
+                    'price' => $product->price,
+                    'discount_price' => $product->discount_price,
+                    'product_id' => $product->id,
+                    'transaction_id' => $transactionId,
+                ]);
+            }
+
+            // Update total transaction
+            $transaction->total = $total + $request->delivery_fee - $request->promo_voucher;
             $transaction->save();
 
-            return redirect()->back()->with('success', $snapToken);
+            // Set up Midtrans params
+            $params = [
+                'transaction_details' => [
+                    'order_id' => $transaction->id,
+                    'gross_amount' => $transaction->total,
+                ],
+                'customer_details' => [
+                    'first_name' => Auth::user()->full_name,
+                    'email' => Auth::user()->email,
+                ],
+            ];
+
+            try {
+                // Generate Snap token
+                $snapToken = Snap::getSnapToken($params);
+                
+                $transaction->token = $snapToken;
+                $transaction->save();
+
+                return redirect()->back()->with('success', $snapToken);
+            } catch (\Exception $e) {
+                return redirect()->back()->with('error', 'Failed to process payment');
+            }
+
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to proccess payment');
+            return redirect()->back()->with('error', 'Failed to create transaction');
         }
     }
 }

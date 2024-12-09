@@ -41,51 +41,40 @@ class TransactionController extends Controller
 
     public function showInstantBuy()
     {
-
-        if (!data_get(Session::get('instant-buy'), 'address_id')) {
-            $address = Address::where('user_id', Auth::id())
-                ->orderByDesc('is_primary')
-                ->first();
-        } else {
-            // Ambil address_id dari session dan cari Address-nya di database
-            $addressId = data_get(Session::get('instant-buy'), 'address_id');
-            $address = Address::find($addressId); // Mengembalikan object Address
+        $user = Auth::user();
+        
+        if (!Session::has('instant-buy')) {
+            return redirect()->route('cart.index');
         }
 
-        $product = Product::with(['tenant', 'productType', 'productMedia'])
-            ->where('id', Session::get('instant-buy')['product_id'])
+        $instantBuy = Session::get('instant-buy');
+        $products = [];
+        $total = 0;
+
+        // Load products data
+        foreach ($instantBuy['products'] as $item) {
+            $product = Product::with(['tenant', 'productType', 'productMedia'])
+                ->find($item['product_id']);
+                
+            if ($product) {
+                $product->quantity = $item['quantity'];
+                $products[] = $product;
+                $total += $product->price * $item['quantity'];
+            }
+        }
+
+        // Get primary address
+        $address = Address::where('user_id', $user->id)
+            ->orderByDesc('is_primary')
             ->first();
 
-        $product->quantity = Session::get('instant-buy')['quantity'];
-
-        $voucherId = Session::get('instant-buy')['voucher_id'] ?? null;
-
-        $vouchers = $voucherId
-            ? UserVoucher::with('voucher')
-            ->where('user_id', Auth::id())
-            ->where('id', $voucherId)
-            ->where('is_active', true)
-            ->get()
-            : null;
-
-        $dist = round($this->haversine($product->tenant->latitude, $product->tenant->longitude, $address->latitude, $address->longitude), 0);
-        $address->distance = $dist > 1000 ? round($dist / 1000, 2) : $dist;
-
-        $addresses = Address::where('user_id', Auth::id())
-            ->where('id', '!=', $address->id)
-            ->get();
-
-        // return response()->json([
-        //     'address' => $address,
-        //     'addresses' => $addresses,
-        //     'product' => $product,
-        //     'voucher' => $vouchers,
-        // ]);
-
         return Inertia::render('Payment', [
-            'product' => $product,
-            'quantity' => $product->quantity,
-            'address' => $address
+            'auth' => $user,
+            'products' => $products,
+            'address' => $address,
+            'total' => $total,
+            'delivery_fee' => $instantBuy['delivery_fee'] ?? 0,
+            'promo_voucher' => $instantBuy['promo_voucher'] ?? 0
         ]);
     }
 
@@ -116,11 +105,16 @@ class TransactionController extends Controller
 
     public function storeInstantBuy(InstantBuyRequest $request)
     {
-
         $validated = $request->validated();
-
-        session()->put('instant-buy', $validated);
-
+        
+        // Pastikan data yang disimpan ke session sesuai format
+        $instantBuy = [
+            'products' => $validated['products'],
+            'delivery_fee' => $validated['delivery_fee'],
+            'promo_voucher' => $validated['promo_voucher']
+        ];
+        
+        session()->put('instant-buy', $instantBuy);
         return redirect()->route('instant-buy');
     }
 }

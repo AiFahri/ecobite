@@ -22,60 +22,30 @@ class InstantBuyRequest extends FormRequest
     public function rules(): array
     {
         return [
-
-            'quantity' => [
-                'required',
-                'numeric',
-                'min:1', // Minimal quantity adalah 1
-            ],
-
-            'product_id' => [
+            'products' => ['required', 'array', 'min:1'],
+            'products.*.product_id' => [
                 'required',
                 'string',
-                'exists:products,id', // Harus ada di tabel products
+                'exists:products,id',
                 function ($attribute, $value, $fail) {
-                    // Validasi stok produk
+                    $index = explode('.', $attribute)[1];
+                    $quantity = request()->input("products.{$index}.quantity");
+                    
                     $product = \App\Models\Product::find($value);
                     if (!$product) {
                         $fail("The selected product does not exist.");
-                    } elseif (request()->quantity > $product->stock) {
+                    } elseif ($quantity > $product->stock) {
                         $fail("The requested quantity exceeds available stock.");
                     }
                 },
             ],
-
-            'voucher_id' => [
-                'nullable',
-                'string',
-                'exists:user_vouchers,id', // Harus ada di tabel user_vouchers
-                function ($attribute, $value, $fail) {
-                    // Validasi voucher hanya boleh milik pengguna yang sedang login dan aktif
-                    $voucher = \App\Models\UserVoucher::where('id', $value)
-                        ->where('user_id', auth()->id())
-                        ->where('is_active', 1)
-                        ->first();
-
-                    if (!$voucher) {
-                        $fail("The selected voucher is invalid or inactive.");
-                    }
-                },
+            'products.*.quantity' => [
+                'required',
+                'numeric',
+                'min:1',
             ],
-
-            'address_id' => [
-                'nullable',
-                'string',
-                'exists:addresses,id', // Harus ada di tabel addresses
-                function ($attribute, $value, $fail) {
-                    // Validasi address hanya boleh milik pengguna yang sedang login
-                    $address = \App\Models\Address::where('id', $value)
-                        ->where('user_id', auth()->id())
-                        ->first();
-
-                    if (!$address) {
-                        $fail("The selected address is invalid or does not belong to you.");
-                    }
-                },
-            ],
+            'delivery_fee' => ['required', 'numeric', 'min:0'],
+            'promo_voucher' => ['nullable', 'numeric', 'min:0'],
         ];
     }
 }

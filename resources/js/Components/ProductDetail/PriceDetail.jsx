@@ -22,18 +22,43 @@ const PriceDetail = ({ product }) => {
         router.post(
             "/instant-buy",
             {
-                product_id: product.id,
-                quantity: quantity,
+                products: [
+                    {
+                        product_id: product.id,
+                        quantity: quantity,
+                    },
+                ],
+                delivery_fee: deliveryFee,
+                promo_voucher: promoVoucher,
             },
             {
-                onSuccess: () => {
-                    // Akan redirect otomatis ke payment page karena ada middleware
-                    console.log("Redirecting to payment page...");
+                onSuccess: (response) => {
+                    if (response?.props?.flash?.success) {
+                        window.snap.pay(response.props.flash.success, {
+                            onSuccess: function (result) {
+                                console.log("Payment success:", result);
+                                router.visit("/transactions");
+                            },
+                            onPending: function (result) {
+                                console.log("Payment pending:", result);
+                            },
+                            onError: function (result) {
+                                console.error("Payment error:", result);
+                            },
+                            onClose: function () {
+                                console.log(
+                                    "Customer closed the popup without finishing the payment"
+                                );
+                            },
+                        });
+                    }
                 },
                 onError: (errors) => {
-                    console.error("Error:", errors);
                     if (errors?.message === "Unauthenticated.") {
                         window.location.href = "/login";
+                    } else {
+                        console.error("Payment error:", errors);
+                        alert("Failed to process payment. Please try again.");
                     }
                 },
             }

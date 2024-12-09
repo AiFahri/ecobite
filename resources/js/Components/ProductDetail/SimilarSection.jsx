@@ -5,18 +5,38 @@ import Line20 from "../../../assets/Line 20.png";
 import ProductCard from "@/Components/Catalog/ProductCard";
 import { router } from "@inertiajs/react";
 
-const SimilarSection = ({ similarProducts = [] }) => {
+const SimilarSection = ({ similarProducts }) => {
+    const { data = [], message } = similarProducts || {
+        data: [],
+        message: null,
+    };
+
+    if (!data || data.length === 0) {
+        return (
+            <div className="container max-w-screen-xl mx-auto font-outfit mt-10">
+                <h2 className="text-2xl font-semibold mb-6">
+                    Similar Selection
+                </h2>
+                <div className="text-center py-10 bg-white rounded-lg shadow-sm">
+                    <p className="text-xl text-gray-600 mb-2">
+                        {message || "No similar products found"}
+                    </p>
+                </div>
+            </div>
+        );
+    }
+
     const [currentPage, setCurrentPage] = useState(0);
     const productsPerPage = 4;
 
     // Hitung total halaman
-    const totalPages = Math.ceil(similarProducts.length / productsPerPage);
+    const totalPages = Math.ceil(data.length / productsPerPage);
 
     // Ambil produk untuk halaman saat ini
     const getCurrentPageProducts = () => {
         const start = currentPage * productsPerPage;
         const end = start + productsPerPage;
-        return similarProducts.slice(start, end);
+        return data.slice(start, end);
     };
 
     const handlePrevPage = () => {
@@ -36,8 +56,16 @@ const SimilarSection = ({ similarProducts = [] }) => {
             "/wishlist/toggle",
             { product_id: productId },
             {
-                preserveScroll: true,
                 preserveState: true,
+                preserveScroll: true,
+                onSuccess: () => {
+                    // UI akan diupdate otomatis karena preserveState: true
+                },
+                onError: (errors) => {
+                    if (errors?.message === "Unauthenticated.") {
+                        window.location.href = "/login";
+                    }
+                },
             }
         );
     };
@@ -83,12 +111,14 @@ const SimilarSection = ({ similarProducts = [] }) => {
                             product={{
                                 id: product.id,
                                 name: product.name,
-                                image: product.photo_urls?.[0],
+                                image: product.photo_urls?.[0] || product.image,
                                 price: product.price,
-                                oldPrice: product.discount_price,
-                                store: product.tenant?.name,
-                                rating: product.avg_stars,
-                                verified: product.tenant?.is_verified,
+                                oldPrice: product.oldPrice,
+                                store: product.tenant?.name || product.store,
+                                rating: product.avg_stars || product.rating,
+                                verified:
+                                    product.tenant?.is_verified ||
+                                    product.verified,
                             }}
                             isWishlist={product.is_wishlisted}
                             onToggleWishlist={() =>

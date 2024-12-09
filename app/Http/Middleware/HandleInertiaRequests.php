@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Illuminate\Http\Request;
 use Inertia\Middleware;
+use App\Models\Cart;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -42,6 +43,15 @@ class HandleInertiaRequests extends Middleware
             'flash' => [
                 'message' => fn () => $request->session()->get('message')
             ],
+            'cartItems' => function () use ($request) {
+                if ($request->user()) {
+                    return Cart::with(['product' => function ($query) {
+                        $query->with(['product_media', 'product_type'])
+                            ->select(['id', 'name', 'price', 'stock', 'product_type_id']);
+                    }])->where('user_id', $request->user()->id)->get();
+                }
+                return [];
+            },
         ]);
     }
 }

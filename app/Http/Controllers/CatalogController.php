@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use App\Models\Wishlist;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class CatalogController extends Controller
 {
@@ -139,7 +140,7 @@ class CatalogController extends Controller
 
     public function show($productID)
     {
-        $user = auth()->user();
+        $user = Auth::user();
         $auth = null;
         if ($user) {
             $auth = [
@@ -157,7 +158,7 @@ class CatalogController extends Controller
             ->with(['transactionItem.transaction.address.user'])
             ->paginate(5);
 
-        // Ambil similar products
+        // Ambil similar products dengan format yang sama seperti Cart
         $similar_products = Product::with(['productMedia', 'tenant', 'productType'])
             ->select('products.*')
             ->join('product_types', 'products.product_type_id', '=', 'product_types.id')
@@ -171,26 +172,33 @@ class CatalogController extends Controller
             ->limit(16)
             ->get();
 
-        // Transform similar products untuk frontend
-        $similar_products = $similar_products->map(function ($product) {
-            $userId = auth()->user()?->id;
-
-            return [
-                'id' => $product->id,
-                'name' => $product->name,
-                'price' => $product->price,
-                'discount_price' => $product->discount_price,
-                'photo_urls' => $product->productMedia->pluck('photo_url'),
-                'avg_stars' => round($product->avg_stars),
-                'tenant' => [
-                    'name' => $product->tenant->name,
-                    'is_verified' => $product->tenant->is_verified
-                ],
-                'is_wishlisted' => $userId ? $product->wishlists()
-                    ->where('user_id', $userId)
-                    ->exists() : false
+        if ($similar_products->isEmpty()) {
+            $similar_products = [
+                'data' => [],
+                'message' => 'No similar products found'
             ];
-        });
+        } else {
+            $similar_products = [
+                'data' => $similar_products->map(function ($product) use ($user) {
+                    return [
+                        'id' => $product->id,
+                        'name' => $product->name,
+                        'price' => $product->price,
+                        'discount_price' => $product->discount_price,
+                        'photo_urls' => $product->productMedia->pluck('photo_url'),
+                        'avg_stars' => round($product->avg_stars),
+                        'tenant' => [
+                            'name' => $product->tenant->name,
+                            'is_verified' => $product->tenant->is_verified
+                        ],
+                        'is_wishlisted' => $user ? $product->wishlists()
+                            ->where('user_id', $user->id)
+                            ->exists() : false
+                    ];
+                }),
+                'message' => null
+            ];
+        }
 
         return Inertia::render('ProductDetail', [
             'auth' => $auth,

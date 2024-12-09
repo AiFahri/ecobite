@@ -16,17 +16,17 @@ import { usePage, router } from "@inertiajs/react";
 
 const Payment = () => {
     const { flash } = usePage().props;
-    const { address, product, quantity, delivery_fee, promo_voucher, auth } = usePage().props;
-    const [selectedAddress, setSelectedAddress] = useState({
-        id: "test-address-id",
-        address: "Jl. Yos Sudarso, Kec. Dringu, Probolinggo, Jawa",
-    });
+    const { auth, products, address, total, delivery_fee, promo_voucher } =
+        usePage().props;
 
     useEffect(() => {
         // Load Midtrans script
         const script = document.createElement("script");
         script.src = "https://app.sandbox.midtrans.com/snap/snap.js";
-        script.setAttribute("data-client-key", "YOUR_MIDTRANS_CLIENT_KEY");
+        script.setAttribute(
+            "data-client-key",
+            import.meta.env.VITE_MIDTRANS_CLIENT_KEY
+        );
         document.head.appendChild(script);
 
         return () => {
@@ -37,31 +37,26 @@ const Payment = () => {
     useEffect(() => {
         if (flash?.success) {
             console.log("Snap Token:", flash.success);
-        }
-        if (flash?.error) {
-            console.log("Payment Error Message:", flash.error);
+            // Handle Midtrans snap
+            window.snap.pay(flash.success, {
+                onSuccess: function (result) {
+                    /* ... */
+                },
+                onPending: function (result) {
+                    /* ... */
+                },
+                onError: function (result) {
+                    /* ... */
+                },
+                onClose: function () {
+                    /* ... */
+                },
+            });
         }
     }, [flash]);
 
-    console.log(product);
-
-    // Jika data belum ada, tampilkan loading
-    if (!product || !quantity) {
-        return (
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
-                    <p className="mt-4">Loading...</p>
-                </div>
-            </div>
-        );
-    }
-
-    const basePrice = product.price * quantity;
-    const totalPrice = basePrice + delivery_fee - promo_voucher;
-
     const handleProceed = () => {
-        if (!selectedAddress) {
+        if (!address) {
             alert("Please select an address first");
             return;
         }
@@ -69,34 +64,39 @@ const Payment = () => {
         router.post(
             "/payment",
             {
-                product_id: product.id,
-                quantity: quantity,
+                products: products.map((product) => ({
+                    product_id: product.id,
+                    quantity: product.quantity,
+                })),
                 address_id: address.id,
+                delivery_fee,
+                promo_voucher,
             },
             {
                 onSuccess: (response) => {
-                    console.log(response.props.flash);
-                    const snapToken = response.props.flash.success;
-                    window.snap.pay(snapToken, {
-                        onSuccess: function (result) {
-                            console.log("Payment success:", result);
-                            // router.visit("/dashboard");
-                        },
-                        onPending: function (result) {
-                            console.log("Payment pending:", result);
-                        },
-                        onError: function (result) {
-                            console.error("Payment error:", result);
-                        },
-                        onClose: function () {
-                            console.log(
-                                "Customer closed the popup without finishing the payment"
-                            );
-                        },
-                    });
+                    if (response?.props?.flash?.success) {
+                        window.snap.pay(response.props.flash.success, {
+                            onSuccess: function (result) {
+                                console.log("Payment success:", result);
+                                router.visit("/transactions");
+                            },
+                            onPending: function (result) {
+                                console.log("Payment pending:", result);
+                            },
+                            onError: function (result) {
+                                console.error("Payment error:", result);
+                            },
+                            onClose: function () {
+                                console.log(
+                                    "Customer closed the popup without finishing the payment"
+                                );
+                            },
+                        });
+                    }
                 },
                 onError: (errors) => {
                     console.error("Payment error:", errors);
+                    alert("Failed to process payment. Please try again.");
                 },
             }
         );
@@ -106,17 +106,16 @@ const Payment = () => {
         <div className="min-h-screen flex flex-col">
             <Navbar auth={auth} />
 
-            <div className="flex-grow">
+            <div className="flex-1">
                 <section>
                     <div className="max-w-screen-xl mx-auto font-outfit">
                         <span className="flex items-center text-gray-400 text-xs">
                             <p>Home /</p>
-                            <p>Catalog /</p>
-                            <p>Product Detail /</p>
+                            <p>Cart /</p>
                             <p className="text-[#173302]">Payment</p>
                         </span>
                         <h2 className="text-2xl my-6 text-[#173302] font-semibold">
-                            {product.name}
+                            Payment Details
                         </h2>
                     </div>
                 </section>
@@ -159,30 +158,42 @@ const Payment = () => {
 
                             <div className="border border-slate-200 rounded-lg p-4">
                                 <h1 className="mb-4">Product Summary</h1>
-                                <div className="flex justify-between items-center">
-                                    <span className="flex items-center">
-                                        <img
-                                            src={
-                                                product.product_media[0]
-                                                    .photo_url
-                                            }
-                                            alt={product.name}
-                                            className="w-16 h-16 object-cover rounded"
-                                        />
-                                        <span className="ml-2">
-                                            <p className="text-xs text-gray-400">
-                                                {product.tenant?.name ||
-                                                    "No Tenant Name"}
-                                            </p>
-                                            <p>{product.name}</p>
-                                        </span>
-                                    </span>
-                                    <span>
-                                        <p className="text-xs text-gray-400 text-end">
-                                            Total : x{quantity}
-                                        </p>
-                                        <p>Rp {basePrice}</p>
-                                    </span>
+                                <div className="space-y-4">
+                                    {products.map((product) => (
+                                        <div
+                                            key={product.id}
+                                            className="flex justify-between items-center"
+                                        >
+                                            <span className="flex items-center">
+                                                <img
+                                                    src={
+                                                        product.product_media[0]
+                                                            .photo_url
+                                                    }
+                                                    alt={product.name}
+                                                    className="w-16 h-16 object-cover rounded"
+                                                />
+                                                <span className="ml-2">
+                                                    <p className="text-xs text-gray-400">
+                                                        {product.tenant?.name}
+                                                    </p>
+                                                    <p>{product.name}</p>
+                                                </span>
+                                            </span>
+                                            <span>
+                                                <p className="text-xs text-gray-400 text-end">
+                                                    Total : x{product.quantity}
+                                                </p>
+                                                <p>
+                                                    Rp{" "}
+                                                    {(
+                                                        product.price *
+                                                        product.quantity
+                                                    ).toLocaleString()}
+                                                </p>
+                                            </span>
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
                         </div>
@@ -198,21 +209,27 @@ const Payment = () => {
                                     <div className="space-y-4">
                                         <div className="flex justify-between">
                                             <p className="text-gray-400">
-                                                Item Quantity ({quantity}pcs)
+                                                Items Total
                                             </p>
-                                            <p>Rp {basePrice}</p>
+                                            <p>Rp {total.toLocaleString()}</p>
                                         </div>
                                         <div className="flex justify-between">
                                             <p className="text-gray-400">
                                                 Delivery (Estimation)
                                             </p>
-                                            <p>Rp {delivery_fee}</p>
+                                            <p>
+                                                Rp{" "}
+                                                {delivery_fee.toLocaleString()}
+                                            </p>
                                         </div>
                                         <div className="flex justify-between">
                                             <p className="text-gray-400">
                                                 Promo Voucher
                                             </p>
-                                            <p>Rp {promo_voucher}</p>
+                                            <p>
+                                                - Rp{" "}
+                                                {promo_voucher.toLocaleString()}
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
@@ -220,14 +237,19 @@ const Payment = () => {
                                     <div className="flex justify-between items-baseline">
                                         <p>Total</p>
                                         <p className="text-xl font-semibold">
-                                            Rp {totalPrice}
+                                            Rp{" "}
+                                            {(
+                                                total +
+                                                delivery_fee -
+                                                promo_voucher
+                                            ).toLocaleString()}
                                         </p>
                                     </div>
                                     <button
-                                        className="bg-[#A1E870] rounded-lg px-5 py-3 w-full mt-4"
                                         onClick={handleProceed}
+                                        className="bg-[#A1E870] rounded-lg px-5 py-3 w-full mt-4 font-semibold text-[#173302]"
                                     >
-                                        Proceed
+                                        Proceed to Payment
                                     </button>
                                 </div>
                             </div>

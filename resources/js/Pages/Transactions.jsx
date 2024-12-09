@@ -124,9 +124,14 @@ const Transactions = () => {
                                         {/* Tenant Info */}
                                         <div className="flex items-center gap-2 mb-4">
                                             <span className="font-medium">
-                                                {transaction.transaction_items[0].product.tenant.name}
+                                                {
+                                                    transaction
+                                                        .transaction_items[0]
+                                                        .product.tenant.name
+                                                }
                                             </span>
-                                            {transaction.transaction_items[0].product.tenant.is_verified && (
+                                            {transaction.transaction_items[0]
+                                                .product.tenant.is_verified && (
                                                 <span className="bg-blue-100 text-blue-600 text-xs px-2 py-1 rounded-full">
                                                     Verified
                                                 </span>
@@ -144,10 +149,16 @@ const Transactions = () => {
                                             <div className="flex-1 flex">
                                                 <img
                                                     src={
-                                                        transaction.transaction_items[0].product.product_media[0].photo_url
+                                                        transaction
+                                                            .transaction_items[0]
+                                                            .product
+                                                            .product_media[0]
+                                                            .photo_url
                                                     }
                                                     alt={
-                                                        transaction.transaction_items[0].product.name
+                                                        transaction
+                                                            .transaction_items[0]
+                                                            .product.name
                                                     }
                                                     className="w-20 h-20 object-cover rounded-lg mr-4"
                                                 />
@@ -156,12 +167,19 @@ const Transactions = () => {
                                                         <div>
                                                             <span className="text-sm text-gray-500">
                                                                 {
-                                                                    transaction.transaction_items[0].product.product_type.name
+                                                                    transaction
+                                                                        .transaction_items[0]
+                                                                        .product
+                                                                        .product_type
+                                                                        .name
                                                                 }
                                                             </span>
                                                             <h3 className="text-lg font-medium">
                                                                 {
-                                                                    transaction.transaction_items[0].product.name
+                                                                    transaction
+                                                                        .transaction_items[0]
+                                                                        .product
+                                                                        .name
                                                                 }
                                                             </h3>
                                                         </div>
@@ -187,12 +205,18 @@ const Transactions = () => {
                                                     Total:
                                                     <p className="text-sm text-gray-600 mt-2">
                                                         {
-                                                            transaction.transaction_items[0].quantity
+                                                            transaction
+                                                                .transaction_items[0]
+                                                                .quantity
                                                         }{" "}
                                                         items x Rp{" "}
                                                         {(
-                                                            transaction.transaction_items[0].product.price /
-                                                                transaction.transaction_items[0].product.stocks
+                                                            transaction
+                                                                .transaction_items[0]
+                                                                .product.price /
+                                                            transaction
+                                                                .transaction_items[0]
+                                                                .product.stocks
                                                         ).toLocaleString()}
                                                     </p>
                                                 </div>

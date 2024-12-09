@@ -19,50 +19,50 @@ const Transaction = () => {
     const [searchQuery, setSearchQuery] = useState("");
 
     // Data dummy yang disesuaikan
-    const dummyTransactions = [
-        {
-            id: 1,
-            tenant: "The Aston Family",
-            isVerified: true,
-            date: "1 December, 2024",
-            status: "Selesai",
-            product: {
-                name: "Vegetable Salad",
-                category: "Vegetables",
-                price: 220000,
-                quantity: 2,
-                image: Rectangle6802_1,
-            },
-        },
-        {
-            id: 2,
-            tenant: "The Aston Family",
-            isVerified: true,
-            date: "1 December, 2024",
-            status: "Selesai",
-            product: {
-                name: "Fresh Broccoli",
-                category: "Vegetables",
-                price: 220000,
-                quantity: 2,
-                image: Rectangle6802_1,
-            },
-        },
-        {
-            id: 3,
-            tenant: "The Aston Family",
-            isVerified: true,
-            date: "1 December, 2024",
-            status: "Selesai",
-            product: {
-                name: "Fresh Cabe",
-                category: "Vegetables",
-                price: 220000,
-                quantity: 2,
-                image: Rectangle6802_1,
-            },
-        },
-    ];
+    // const dummyTransactions = [
+    //     {
+    //         id: 1,
+    //         tenant: "The Aston Family",
+    //         isVerified: true,
+    //         date: "1 December, 2024",
+    //         status: "Selesai",
+    //         product: {
+    //             name: "Vegetable Salad",
+    //             category: "Vegetables",
+    //             price: 220000,
+    //             quantity: 2,
+    //             image: Rectangle6802_1,
+    //         },
+    //     },
+    //     {
+    //         id: 2,
+    //         tenant: "The Aston Family",
+    //         isVerified: true,
+    //         date: "1 December, 2024",
+    //         status: "Selesai",
+    //         product: {
+    //             name: "Fresh Broccoli",
+    //             category: "Vegetables",
+    //             price: 220000,
+    //             quantity: 2,
+    //             image: Rectangle6802_1,
+    //         },
+    //     },
+    //     {
+    //         id: 3,
+    //         tenant: "The Aston Family",
+    //         isVerified: true,
+    //         date: "1 December, 2024",
+    //         status: "Selesai",
+    //         product: {
+    //             name: "Fresh Cabe",
+    //             category: "Vegetables",
+    //             price: 220000,
+    //             quantity: 2,
+    //             image: Rectangle6802_1,
+    //         },
+    //     },
+    // ];
 
     const handleSearch = (e) => {
         setSearchQuery(e.target.value);
