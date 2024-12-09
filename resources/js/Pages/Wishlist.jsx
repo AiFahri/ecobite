@@ -1,10 +1,10 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Head, usePage, router } from "@inertiajs/react";
 import Navbar from "@/Components/Navbar";
 import Footer from "@/Components/Footer";
 import ProductCard from "@/Components/Catalog/ProductCard";
 import SearchBar from "@/Components/Catalog/SearchBar";
-import ProductFilter from "@/Components/Catalog/ProductFilter";
+import WishlistFilter from "@/Components/Wishlist/WishlistFilter";
 import PromoImage from "../../assets/promo2.png";
 
 const Wishlist = () => {
@@ -16,26 +16,50 @@ const Wishlist = () => {
         filters = {},
         auth,
     } = usePage().props;
-    const [searchQuery, setSearchQuery] = React.useState("");
-    const [filteredProducts, setFilteredProducts] = React.useState(
+
+    const [searchQuery, setSearchQuery] = useState("");
+    const [filteredProducts, setFilteredProducts] = useState(
         wishlists.data || []
     );
 
-    const handleSearch = (e) => {
-        const query = e.target.value;
-        setSearchQuery(query);
+    // Effect untuk inisialisasi filter dari URL
+    useEffect(() => {
+        if (filters) {
+            setSearchQuery(filters.search || "");
+        }
+    }, [filters]);
 
-        const filtered =
-            wishlists.data?.filter(
+    // Effect untuk filter products
+    useEffect(() => {
+        // Filter products berdasarkan searchQuery
+        if (searchQuery.trim() === "") {
+            setFilteredProducts(wishlists.data || []);
+        } else {
+            const searchTerm = searchQuery.toLowerCase();
+            const filtered = wishlists.data?.filter(
                 (item) =>
-                    item.product.name
-                        .toLowerCase()
-                        .includes(query.toLowerCase()) ||
+                    item.product.name.toLowerCase().includes(searchTerm) ||
                     item.product.tenant?.name
-                        .toLowerCase()
-                        .includes(query.toLowerCase())
-            ) || [];
-        setFilteredProducts(filtered);
+                        ?.toLowerCase()
+                        .includes(searchTerm)
+            );
+            setFilteredProducts(filtered || []);
+        }
+    }, [searchQuery, wishlists.data]);
+
+    const handleSearch = (e) => {
+        setSearchQuery(e.target.value);
+    };
+
+    const handleFilter = () => {
+        router.get(
+            "/wishlist",
+            { search: searchQuery },
+            {
+                preserveState: true,
+                preserveScroll: true,
+            }
+        );
     };
 
     const handleToggleWishlist = (productId) => {
@@ -47,6 +71,15 @@ const Wishlist = () => {
                 preserveState: true,
             }
         );
+    };
+
+    const handleFilterChange = (filters) => {
+        setFilteredProducts(wishlists.data); // Reset filtered products saat filter berubah
+        router.get("/wishlist", filters, {
+            preserveState: true,
+            preserveScroll: true,
+            replace: true,
+        });
     };
 
     return (
@@ -72,6 +105,7 @@ const Wishlist = () => {
                             <SearchBar
                                 value={searchQuery}
                                 onChange={handleSearch}
+                                onEnter={handleFilter}
                                 placeholder="Search in your wishlist..."
                                 className="w-full mr-12"
                                 currentPath="/wishlist"
@@ -84,10 +118,11 @@ const Wishlist = () => {
                             <div className="grid grid-cols-4 gap-6 mb-20">
                                 {/* Filter Column */}
                                 <div className="row-span-full">
-                                    <ProductFilter
+                                    <WishlistFilter
                                         productTypes={productTypes}
                                         tenantTypes={tenantTypes}
                                         starCount={starCount}
+                                        onFilterChange={handleFilterChange}
                                     />
                                     <div className="rounded-lg mt-6 h-fit text-center font-outfit font-semibold">
                                         <img
@@ -150,19 +185,99 @@ const Wishlist = () => {
                                     </div>
 
                                     {wishlists.data?.length > 0 && (
-                                        <div className="flex justify-between items-center mt-8">
-                                            <p className="text-slate-400">
-                                                Showing{" "}
-                                                <b className="text-black font-normal">
-                                                    {wishlists.from || 0} -{" "}
-                                                    {wishlists.to || 0}
-                                                </b>{" "}
-                                                of{" "}
-                                                <b className="text-black font-normal">
-                                                    {wishlists.total || 0}
-                                                </b>{" "}
-                                                Products
-                                            </p>
+                                        <div className="mt-8">
+                                            <div className="flex justify-between items-center">
+                                                <p className="text-slate-400">
+                                                    Showing{" "}
+                                                    <b className="text-black font-normal">
+                                                        {wishlists.from || 0} -{" "}
+                                                        {wishlists.to || 0}
+                                                    </b>{" "}
+                                                    Products From{" "}
+                                                    <b className="text-black font-normal">
+                                                        {wishlists.total || 0}
+                                                    </b>
+                                                    Results
+                                                </p>
+
+                                                <span className="flex">
+                                                    {wishlists.links?.map(
+                                                        (link, i) => {
+                                                            if (
+                                                                link.label ===
+                                                                "&laquo; Previous"
+                                                            ) {
+                                                                return (
+                                                                    <button
+                                                                        key={i}
+                                                                        className={`p-2 mx-1 ${
+                                                                            link.active
+                                                                                ? "bg-[#173302] text-white"
+                                                                                : "border border-slate-200"
+                                                                        } rounded-md w-10 h-10 text-center`}
+                                                                        onClick={() =>
+                                                                            link.url &&
+                                                                            router.get(
+                                                                                link.url
+                                                                            )
+                                                                        }
+                                                                        disabled={
+                                                                            !link.url
+                                                                        }
+                                                                    >
+                                                                        &lt;
+                                                                    </button>
+                                                                );
+                                                            }
+                                                            if (
+                                                                link.label ===
+                                                                "Next &raquo;"
+                                                            ) {
+                                                                return (
+                                                                    <button
+                                                                        key={i}
+                                                                        className={`p-2 mx-1 ${
+                                                                            link.active
+                                                                                ? "bg-[#173302] text-white"
+                                                                                : "border border-slate-200"
+                                                                        } rounded-md w-10 h-10 text-center`}
+                                                                        onClick={() =>
+                                                                            link.url &&
+                                                                            router.get(
+                                                                                link.url
+                                                                            )
+                                                                        }
+                                                                        disabled={
+                                                                            !link.url
+                                                                        }
+                                                                    >
+                                                                        &gt;
+                                                                    </button>
+                                                                );
+                                                            }
+                                                            return (
+                                                                <button
+                                                                    key={i}
+                                                                    className={`p-2 mx-1 ${
+                                                                        link.active
+                                                                            ? "bg-[#173302] text-white"
+                                                                            : "border border-slate-200"
+                                                                    } rounded-md w-10 h-10 text-center`}
+                                                                    onClick={() =>
+                                                                        link.url &&
+                                                                        router.get(
+                                                                            link.url
+                                                                        )
+                                                                    }
+                                                                    dangerouslySetInnerHTML={{
+                                                                        __html: link.label,
+                                                                    }}
+                                                                />
+                                                            );
+                                                        }
+                                                    )}
+                                                </span>
+                                            </div>
                                         </div>
                                     )}
                                 </div>

@@ -41,7 +41,7 @@ const ProductDetail = () => {
     const mainPhoto = productData?.photo_urls?.[0] || "";
     const additionalPhotos = productData?.photo_urls?.slice(1) || [];
 
-    console.log('total reviews: ' + reviews);
+    console.log("total reviews: " + reviews);
 
     const handleSearch = (e) => {
         setSearchQuery(e.target.value);
@@ -248,8 +248,10 @@ const ProductDetail = () => {
                                                 Food Review
                                             </p>
                                             <p className="text-gray-500 text-sm">
-                                                Showing {reviews.meta.from}{"-"}{reviews.meta.to}{" "}
-                                                Reviews From {reviews.meta.total}{" "} Results
+                                                Showing {reviews.meta.from || 0}{" "}
+                                                - {reviews.meta.to || 0} Reviews
+                                                From {reviews.meta.total || 0}{" "}
+                                                Results
                                             </p>
                                         </span>
                                         <button className="px-5 py-4 border border-slate-200 rounded-lg">
@@ -271,6 +273,104 @@ const ProductDetail = () => {
                                         </p>
                                     )}
                                 </div>
+
+                                {reviews.meta.total > 0 && (
+                                    <div className="mt-6">
+                                        <div className="flex justify-between items-center">
+                                            <p className="text-slate-400">
+                                                Showing{" "}
+                                                <b className="text-black font-normal">
+                                                    {reviews.meta.from || 0} -{" "}
+                                                    {reviews.meta.to || 0}
+                                                </b>{" "}
+                                                Reviews From{" "}
+                                                <b className="text-black font-normal">
+                                                    {reviews.meta.total || 0}
+                                                </b>{" "}
+                                                Results
+                                            </p>
+
+                                            <span className="flex">
+                                                {Array.isArray(reviews.links) &&
+                                                    reviews.links.map(
+                                                        (link, i) => {
+                                                            if (
+                                                                link.label ===
+                                                                "&laquo; Previous"
+                                                            ) {
+                                                                return (
+                                                                    <button
+                                                                        key={i}
+                                                                        className={`p-2 mx-1 ${
+                                                                            link.active
+                                                                                ? "bg-[#173302] text-white"
+                                                                                : "border border-slate-200"
+                                                                        } rounded-md w-10 h-10 text-center`}
+                                                                        onClick={() =>
+                                                                            link.url &&
+                                                                            router.get(
+                                                                                link.url
+                                                                            )
+                                                                        }
+                                                                        disabled={
+                                                                            !link.url
+                                                                        }
+                                                                    >
+                                                                        &lt;
+                                                                    </button>
+                                                                );
+                                                            }
+                                                            if (
+                                                                link.label ===
+                                                                "Next &raquo;"
+                                                            ) {
+                                                                return (
+                                                                    <button
+                                                                        key={i}
+                                                                        className={`p-2 mx-1 ${
+                                                                            link.active
+                                                                                ? "bg-[#173302] text-white"
+                                                                                : "border border-slate-200"
+                                                                        } rounded-md w-10 h-10 text-center`}
+                                                                        onClick={() =>
+                                                                            link.url &&
+                                                                            router.get(
+                                                                                link.url
+                                                                            )
+                                                                        }
+                                                                        disabled={
+                                                                            !link.url
+                                                                        }
+                                                                    >
+                                                                        &gt;
+                                                                    </button>
+                                                                );
+                                                            }
+                                                            return (
+                                                                <button
+                                                                    key={i}
+                                                                    className={`p-2 mx-1 ${
+                                                                        link.active
+                                                                            ? "bg-[#173302] text-white"
+                                                                            : "border border-slate-200"
+                                                                    } rounded-md w-10 h-10 text-center`}
+                                                                    onClick={() =>
+                                                                        link.url &&
+                                                                        router.get(
+                                                                            link.url
+                                                                        )
+                                                                    }
+                                                                    dangerouslySetInnerHTML={{
+                                                                        __html: link.label,
+                                                                    }}
+                                                                />
+                                                            );
+                                                        }
+                                                    )}
+                                            </span>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         )}
                     </div>

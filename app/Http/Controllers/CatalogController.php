@@ -153,10 +153,44 @@ class CatalogController extends Controller
 
         $product = Product::with(['tenant', 'productMedia'])->findOrFail($productID);
 
-        // Paginate ratings
+        // Paginate ratings dengan transformasi data
         $ratings = $product->ratings()
             ->with(['transactionItem.transaction.address.user'])
+            ->orderBy('created_at', 'desc')
             ->paginate(5);
+
+        // Format data pagination untuk frontend
+        $formattedRatings = [
+            'data' => collect($ratings->items())->map(function ($rating) {
+                return [
+                    'id' => $rating->id,
+                    'star' => $rating->star,
+                    'feedback' => $rating->feedback,
+                    'created_at' => $rating->created_at,
+                    'transaction_item' => [
+                        'transaction' => [
+                            'address' => [
+                                'user' => [
+                                    'full_name' => $rating->transactionItem->transaction->address->user->full_name,
+                                    'photo_url' => $rating->transactionItem->transaction->address->user->photo_url,
+                                ],
+                                'city' => $rating->transactionItem->transaction->address->city,
+                                'state' => $rating->transactionItem->transaction->address->state,
+                            ]
+                        ]
+                    ]
+                ];
+            })->all(),
+            'links' => $ratings->linkCollection()->toArray(),
+            'meta' => [
+                'from' => $ratings->firstItem(),
+                'to' => $ratings->lastItem(),
+                'total' => $ratings->total(),
+                'current_page' => $ratings->currentPage(),
+                'last_page' => $ratings->lastPage(),
+                'per_page' => $ratings->perPage(),
+            ]
+        ];
 
         // Ambil similar products dengan format yang sama seperti Cart
         $similar_products = Product::with(['productMedia', 'tenant', 'productType'])
@@ -201,18 +235,10 @@ class CatalogController extends Controller
         }
 
         return Inertia::render('ProductDetail', [
-            'auth' => $auth,
             'product' => new ProductResource($product),
-            'reviews' => [
-                'data' => $ratings->items(),
-                'links' => $ratings->links(),
-                'meta' => [
-                    'from' => $ratings->firstItem(),
-                    'to' => $ratings->lastItem(),
-                    'total' => $ratings->total(),
-                ]
-            ],
-            'similar_products' => $similar_products
+            'reviews' => $formattedRatings,
+            'similar_products' => $similar_products,
+            'auth' => $auth
         ]);
     }
 }

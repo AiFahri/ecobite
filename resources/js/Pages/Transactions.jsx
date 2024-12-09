@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { usePage } from "@inertiajs/react";
+import { usePage, router } from "@inertiajs/react";
 import Navbar from "@/Components/Navbar";
 import Footer from "@/Components/Footer";
 import SimilarSection from "@/Components/ProductDetail/SimilarSection";
@@ -13,6 +13,8 @@ import Rectangle6802_1 from "../../assets/img/Rectangle 6802 (1).png";
 import RefreshIcon from "../../assets/assets/refresh.svg";
 import SearchIcon from "../../assets/assets/search.svg";
 import DeleteIcon from "../../assets/assets/delete.svg";
+
+import TransactionFilter from "@/Components/Transaction/TransactionFilter";
 
 const Transactions = () => {
     const { auth, transactions } = usePage().props;
@@ -71,16 +73,22 @@ const Transactions = () => {
     };
 
     const handleSearchEnter = () => {
-        // Implementasi pencarian produk di cart
-        console.log("Searching cart items:", searchQuery);
-        // Di sini bisa ditambahkan logika untuk filter produk di cart
+        router.get(
+            "/transactions",
+            { search: searchQuery },
+            {
+                preserveState: true,
+                preserveScroll: true,
+                replace: true,
+            }
+        );
     };
 
     return (
         <div className="overflow-y-scroll no-scrollbar">
             <Navbar auth={auth} />
 
-            <div className="container max-w-screen-xl mx-auto font-outfit">
+            <div className="container max-w-screen-xl mx-auto font-outfit mb-16">
                 {/* Breadcrumb & Title */}
                 <div className="py-4 space-y-2">
                     <span className="text-gray-500 text-left">
@@ -95,7 +103,7 @@ const Transactions = () => {
                         value={searchQuery}
                         onChange={handleSearch}
                         onEnter={handleSearchEnter}
-                        placeholder="Cari sesuatu di keranjang..."
+                        placeholder="Search in transaction..."
                         currentPath="/cart"
                         showIcons={true}
                         className="w-full"
@@ -106,7 +114,7 @@ const Transactions = () => {
                 <div className="flex gap-4">
                     {/* Left Sidebar - Filter */}
                     <div className="w-1/4">
-                        <ProductFilter />
+                        <TransactionFilter />
                     </div>
 
                     {/* Right Content - Product Summary */}
@@ -225,6 +233,104 @@ const Transactions = () => {
                                     </div>
                                 ))}
                             </div>
+
+                            {/* Tambahkan pagination */}
+                            {transactions.data?.length > 0 && (
+                                <div className="p-4 border-t">
+                                    <div className="flex justify-between items-center">
+                                        <p className="text-slate-400">
+                                            Showing{" "}
+                                            <b className="text-black font-normal">
+                                                {transactions.from || 0} -{" "}
+                                                {transactions.to || 0}
+                                            </b>{" "}
+                                            Products From{" "}
+                                            <b className="text-black font-normal">
+                                                {transactions.total || 0}
+                                            </b>{" "}
+                                            Results
+                                        </p>
+
+                                        <span className="flex">
+                                            {transactions.links?.map(
+                                                (link, i) => {
+                                                    if (
+                                                        link.label ===
+                                                        "&laquo; Previous"
+                                                    ) {
+                                                        return (
+                                                            <button
+                                                                key={i}
+                                                                className={`p-2 mx-1 ${
+                                                                    link.active
+                                                                        ? "bg-[#173302] text-white"
+                                                                        : "border border-slate-200"
+                                                                } rounded-md w-10 h-10 text-center`}
+                                                                onClick={() =>
+                                                                    link.url &&
+                                                                    router.get(
+                                                                        link.url
+                                                                    )
+                                                                }
+                                                                disabled={
+                                                                    !link.url
+                                                                }
+                                                            >
+                                                                &lt;
+                                                            </button>
+                                                        );
+                                                    }
+                                                    if (
+                                                        link.label ===
+                                                        "Next &raquo;"
+                                                    ) {
+                                                        return (
+                                                            <button
+                                                                key={i}
+                                                                className={`p-2 mx-1 ${
+                                                                    link.active
+                                                                        ? "bg-[#173302] text-white"
+                                                                        : "border border-slate-200"
+                                                                } rounded-md w-10 h-10 text-center`}
+                                                                onClick={() =>
+                                                                    link.url &&
+                                                                    router.get(
+                                                                        link.url
+                                                                    )
+                                                                }
+                                                                disabled={
+                                                                    !link.url
+                                                                }
+                                                            >
+                                                                &gt;
+                                                            </button>
+                                                        );
+                                                    }
+                                                    return (
+                                                        <button
+                                                            key={i}
+                                                            className={`p-2 mx-1 ${
+                                                                link.active
+                                                                    ? "bg-[#173302] text-white"
+                                                                    : "border border-slate-200"
+                                                            } rounded-md w-10 h-10 text-center`}
+                                                            onClick={() =>
+                                                                link.url &&
+                                                                router.get(
+                                                                    link.url
+                                                                )
+                                                            }
+                                                            dangerouslySetInnerHTML={{
+                                                                __html: link.label,
+                                                            }}
+                                                        />
+                                                    );
+                                                }
+                                            )}
+                                        </span>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

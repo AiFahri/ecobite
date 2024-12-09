@@ -25,6 +25,8 @@ class WishlistController extends Controller
                 'photo_url' => $user->photo_url,
             ];
         }
+
+        // Base query untuk wishlist
         $wishlists = Wishlist::where('user_id', $user->id)
             ->with(['product' => function ($query) {
                 $query->with(['tenant', 'productMedia', 'productType'])
@@ -33,75 +35,126 @@ class WishlistController extends Controller
             ->whereHas('product');
 
         // Filter Food Type
-        if ($request->has('food_type')) {
-            $foodTypes = explode(',', $request->food_type); // Memecah string menjadi array
-            $wishlists->whereHas('productType', function ($query) use ($foodTypes) {
-                $query->whereIn('name', $foodTypes); // Kolom `name` di tabel product_types
+        if ($request->filled('food_type')) {
+            $foodTypes = explode(',', $request->food_type);
+            $wishlists->whereHas('product.productType', function ($query) use ($foodTypes) {
+                $query->whereIn('name', $foodTypes);
             });
         }
 
         // Filter Tenant Type
-        if ($request->has('tenant_type')) {
-            $tenantTypes = explode(',', $request->tenant_type); // Memecah string menjadi array
-            $wishlists->whereHas('tenant', function ($query) use ($tenantTypes) {
-                $query->whereHas('tenantType', function ($subQuery) use ($tenantTypes) {
-                    $subQuery->whereIn('name', $tenantTypes); // `name` adalah kolom di tabel tenant_types
-                });
+        if ($request->filled('tenant_type')) {
+            $tenantTypes = explode(',', $request->tenant_type);
+            $wishlists->whereHas('product.tenant.tenantType', function ($query) use ($tenantTypes) {
+                $query->whereIn('name', $tenantTypes);
             });
         }
 
         // Filter Price
-        if ($request->has('min_price') || $request->has('max_price')) {
-            $wishlists->where(function ($query) use ($request) {
+        if ($request->filled('min_price') || $request->filled('max_price')) {
+            $wishlists->whereHas('product', function ($query) use ($request) {
                 if ($request->filled('min_price') && $request->filled('max_price')) {
-                    // Filter untuk min_price dan max_price secara bersamaan
-                    $query->where(function ($subQuery) use ($request) {
-                        $subQuery->whereBetween('price', [$request->min_price, $request->max_price])
-                            ->orWhereBetween('discount_price', [$request->min_price, $request->max_price]);
-                    });
+                    $query->whereBetween('price', [$request->min_price, $request->max_price]);
                 } elseif ($request->filled('min_price')) {
-                    // Filter hanya untuk min_price
-                    $query->where('price', '>=', $request->min_price)
-                        ->orWhere('discount_price', '>=', $request->min_price);
+                    $query->where('price', '>=', $request->min_price);
                 } elseif ($request->filled('max_price')) {
-                    // Filter hanya untuk max_price
-                    $query->where('price', '<=', $request->max_price)
-                        ->orWhere('discount_price', '<=', $request->max_price);
+                    $query->where('price', '<=', $request->max_price);
                 }
             });
         }
 
-        // Filter Rating
+        // Filter Rating - Perbaikan query
         if ($request->filled('rating')) {
             $ratings = explode(',', $request->rating);
-            $wishlists->havingRaw('FLOOR(COALESCE(ratings_avg_star, 0)) IN (' . implode(',', $ratings) . ')');
+            $wishlists->whereHas('product', function ($query) use ($ratings) {
+                $query->whereIn(
+                    DB::raw('COALESCE(FLOOR((SELECT AVG(star) FROM transaction_item_ratings 
+                    INNER JOIN transaction_items ON transaction_items.id = transaction_item_ratings.transaction_item_id 
+                    WHERE transaction_items.product_id = products.id)), 0)'),
+                    $ratings
+                );
+            });
         }
 
-        $wishlists = $wishlists->paginate(12);
-
-        $productTypes = ProductType::withCount('products')
-            ->orderBy('products_count', 'DESC')
-            ->get(['name'])->map(function ($type) {
-                return [
-                    'name' => $type->name,
-                    'total' => $type->products_count,
-                ];
+        // Get product types dengan count - Hanya untuk produk di wishlist
+        $productTypes = ProductType::whereHas('products', function($query) use ($user) {
+            $query->whereHas('wishlists', function($q) use ($user) {
+                $q->where('user_id', $user->id);
             });
+        })
+        ->withCount(['products' => function($query) use ($user) {
+            $query->whereHas('wishlists', function($q) use ($user) {
+                $q->where('user_id', $user->id);
+            });
+        }])
+        ->orderBy('products_count', 'DESC')
+        ->get(['name'])
+        ->map(function ($type) {
+            return [
+                'name' => $type->name,
+                'total' => $type->products_count,
+            ];
+        });
 
+        // Get tenant types
         $tenantTypes = TenantType::orderBy('created_at')->pluck('name');
 
-        $subquery = DB::table('products as p')
-            ->join('transaction_items as ti', 'p.id', '=', 'ti.product_id')
-            ->join('transaction_item_ratings as tir', 'ti.id', '=', 'tir.transaction_item_id')
-            ->selectRaw('FLOOR(AVG(tir.star)) as rating_group')
-            ->groupBy('ti.product_id');
+        // Get star count - Perbaikan untuk akurasi rating
+        $starCount = collect(range(1, 5))->map(function($rating) use ($user) {
+            $count = DB::table('products')
+                ->join('wishlists', 'products.id', '=', 'wishlists.product_id')
+                ->where('wishlists.user_id', $user->id)
+                ->whereRaw('
+                    COALESCE(FLOOR((
+                        SELECT AVG(star) 
+                        FROM transaction_item_ratings 
+                        INNER JOIN transaction_items ON transaction_items.id = transaction_item_ratings.transaction_item_id 
+                        WHERE transaction_items.product_id = products.id
+                    )), 0) = ?
+                ', [$rating])
+                ->count();
 
-        $starCount = DB::table(DB::raw("({$subquery->toSql()}) as grouped_ratings"))
-            ->mergeBindings($subquery)
-            ->selectRaw('rating_group, COUNT(*) as total_products')
-            ->groupBy('rating_group')
-            ->orderBy('rating_group', 'DESC')
-            ->get();
+            return [
+                'rating_group' => $rating,
+                'total_products' => $count
+            ];
+        })->sortByDesc('rating_group')->values();
+
+        // Alternative approach jika yang di atas masih error
+        if ($starCount->sum('total_products') === 0) {
+            $starCount = collect(range(1, 5))->map(function($rating) {
+                return [
+                    'rating_group' => $rating,
+                    'total_products' => 0
+                ];
+            })->sortByDesc('rating_group')->values();
+        }
+
+        // Pagination dengan transformasi data
+        $wishlists = $wishlists->paginate(12)->withQueryString();
+        
+        // Transform data pagination untuk frontend
+        $wishlists->through(function ($wishlist) {
+            return [
+                'id' => $wishlist->id,
+                'product' => [
+                    'id' => $wishlist->product->id,
+                    'name' => $wishlist->product->name,
+                    'price' => $wishlist->product->price,
+                    'original_price' => $wishlist->product->original_price,
+                    'tenant' => [
+                        'name' => $wishlist->product->tenant?->name,
+                        'is_verified' => $wishlist->product->tenant?->is_verified,
+                    ],
+                    'ratings_avg_star' => round($wishlist->product->ratings_avg_star ?? 0),
+                    'product_media' => $wishlist->product->productMedia->map(function ($media) {
+                        return [
+                            'photo_url' => $media->photo_url
+                        ];
+                    }),
+                ],
+            ];
+        });
 
         return Inertia::render('Wishlist', [
             'wishlists' => $wishlists,

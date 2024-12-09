@@ -18,9 +18,9 @@ class TransactionController extends Controller
 {
     //
 
-    public function index()
+    public function index(Request $request)
     {
-        $transactions = \App\Models\Transaction::query()
+        $query = \App\Models\Transaction::query()
             ->with([
                 'transactionItems.product.productType',
                 'transactionItems.product.productMedia',
@@ -29,13 +29,37 @@ class TransactionController extends Controller
             ])
             ->whereHas('address.user', function ($query) {
                 $query->where('id', Auth::id());
-            })
-            ->orderBy('created_at', 'desc')
-            ->paginate(5);
+            });
+
+        // Tambahkan filter pencarian
+        if ($request->has('search')) {
+            $search = $request->search;
+            $query->whereHas('transactionItems.product', function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhereHas('tenant', function($q2) use ($search) {
+                      $q2->where('name', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        // Filter berdasarkan status
+        if ($request->has('status')) {
+            $query->where('status', $request->status);
+        }
+
+        // Filter berdasarkan tanggal
+        if ($request->has('date_from') && $request->has('date_to')) {
+            $query->whereBetween('created_at', [$request->date_from, $request->date_to]);
+        }
+
+        $transactions = $query->orderBy('created_at', 'desc')
+            ->paginate(5)
+            ->withQueryString();
 
         return Inertia::render('Transactions', [
             'auth' => Auth::user(),
-            'transactions' => $transactions
+            'transactions' => $transactions,
+            'filters' => $request->only(['search', 'status', 'date_from', 'date_to'])
         ]);
     }
 
