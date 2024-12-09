@@ -14,6 +14,10 @@ Route::get('/', function () {
     return Inertia::render('Home');
 });
 
+use App\Http\Controllers\HomeController;
+
+Route::get('/', [HomeController::class, 'index'])->name('home');
+
 Route::get('/catalog', [CatalogController::class, 'index'])->name('catalog.index');
 Route::get('/products/{productID}', [CatalogController::class, 'show'])->name('products.show');
 
@@ -27,6 +31,13 @@ Route::middleware(['auth'])->group(function () {
     Route::get('instant-buy', [TransactionController::class, 'showInstantBuy'])->middleware('payment')->name('instant-buy');
 
     Route::post('instant-buy', [TransactionController::class, 'storeInstantBuy']);
+    // Cart routes
+    Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+    Route::post('/cart/add', [CartController::class, 'addToCart'])->name('cart.add');
+    Route::post('/cart/update/{cartId}', [CartController::class, 'updateQuantity'])->name('cart.update');
+    Route::delete('/cart/remove/{cartId}', [CartController::class, 'removeItem'])->name('cart.remove');
+    Route::delete('/cart/remove-all', [CartController::class, 'removeAll'])->name('cart.removeAll');
+    Route::post('/cart/toggle-wishlist/{productId}', [CartController::class, 'toggleWishlist'])->name('cart.toggleWishlist');
 });
 
 Route::get('/products', [CatalogController::class, 'index'])->name('products.index');
@@ -37,9 +48,6 @@ Route::get('/products/{productID}', [CatalogController::class, 'show'])->name('p
 Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('login.post');
 
 
-
-
-
 Route::get('/admin/superadmin', function () {
     return Inertia::render('Admin/SuperAdmin');
 });
@@ -47,5 +55,15 @@ Route::get('/admin/superadmin', function () {
 Route::get('/map', function () {
     return Inertia::render('Map');
 });
+
+
+// Route::get('/pre', function () {
+//     // dd(Auth::id());
+//     return view('pre');
+// })->name('pre');
+
+Route::get('/pre2', function () {
+    return view('pre2');
+})->name('pre2');
 
 require __DIR__ . '/auth.php';

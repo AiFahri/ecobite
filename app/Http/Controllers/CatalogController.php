@@ -18,6 +18,17 @@ class CatalogController extends Controller
     public function index(Request $request)
     {
         $user = auth()->user();
+        
+        $auth = null;
+        if ($user) {
+            $auth = [
+                'id' => $user->id,
+                'full_name' => $user->full_name,
+                'email' => $user->email,
+                'photo_url' => $user->photo_url,
+            ];
+        }
+
         $wishlists = [];
 
         if ($user) {
@@ -121,12 +132,24 @@ class CatalogController extends Controller
             'productTypes' => $productTypes,
             'tenantTypes' => $tenantTypes,
             'starCount' => $starCount,
-            'filters' => request()->only(['search', 'type', 'rating'])
+            'filters' => request()->only(['search', 'type', 'rating']),
+            'auth' => $auth
         ]);
     }
 
     public function show($productID)
     {
+        $user = auth()->user();
+        $auth = null;
+        if ($user) {
+            $auth = [
+                'id' => $user->id,
+                'full_name' => $user->full_name,
+                'email' => $user->email,
+                'photo_url' => $user->photo_url,
+            ];
+        }
+
         $product = Product::with(['tenant', 'productMedia'])->findOrFail($productID);
 
         // Paginate ratings
@@ -170,6 +193,7 @@ class CatalogController extends Controller
         });
 
         return Inertia::render('ProductDetail', [
+            'auth' => $auth,
             'product' => new ProductResource($product),
             'reviews' => [
                 'data' => $ratings->items(),

@@ -26,9 +26,7 @@ import BookmarkFilledIcon from "../../assets/solar_bookmark-bold.svg";
 import ShareIcon from "../../assets/share.svg"; // Tambahkan icon share
 
 const ProductDetail = () => {
-    const { product, reviews, meta, similar_products } = usePage().props;
-    console.log("Reviews:", reviews);
-    console.log("Meta:", meta);
+    const { product, reviews, meta, similar_products, auth } = usePage().props;
     const productData = product?.data?.product;
     const tenantData = product?.data?.tenant;
     const [searchQuery, setSearchQuery] = useState("");
@@ -92,7 +90,7 @@ const ProductDetail = () => {
 
     return (
         <div className="overflow-y-scroll no-scrollbar">
-            <Navbar />
+            <Navbar auth={auth} />
             <section>
                 <div className="max-w-screen-xl mx-auto font-outfit">
                     <span className="flex items-center text-gray-400">

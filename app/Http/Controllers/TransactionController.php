@@ -33,6 +33,7 @@ class TransactionController extends Controller
             ->paginate(5);
 
         return Inertia::render('Transactions', [
+            'auth' => Auth::user(),
             'transactions' => $transactions
         ]);
     }

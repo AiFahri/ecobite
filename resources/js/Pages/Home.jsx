@@ -10,7 +10,11 @@ import Hero5 from "../Components/Home/Hero5";
 import Footer from "../Components/Footer";
 import ProductCard from "../Components/Home/ProductCard";
 import Question from "../Components/Home/Question";
+import { usePage } from "@inertiajs/react";
+
 const Home = () => {
+    const { auth } = usePage().props;
+
     return (
         <>
             <div className="overflow overflow-y-scroll no-scrollbar">
@@ -18,7 +22,7 @@ const Home = () => {
                     className="bg-cover"
                     style={{ backgroundImage: `url(${HomeBg})` }}
                 >
-                    <Navbar />
+                    <Navbar auth={auth} />
                     <Hero />
                 </div>
                 <Hero2 />

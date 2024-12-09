@@ -14,7 +14,7 @@ import RefreshIcon from "../../assets/assets/refresh.svg";
 import SearchIcon from "../../assets/assets/search.svg";
 import DeleteIcon from "../../assets/assets/delete.svg";
 
-const Transactions = () => {
+const Transaction = () => {
     const { auth } = usePage().props;
     const [searchQuery, setSearchQuery] = useState("");
 
@@ -216,4 +216,4 @@ const Transactions = () => {
     );
 };
 
-export default Transactions;
+export default Transaction;

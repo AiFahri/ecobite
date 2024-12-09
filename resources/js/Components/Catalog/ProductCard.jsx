@@ -59,6 +59,27 @@ const ProductCard = ({ product, isWishlist = false, onToggleWishlist }) => {
             quantity: 1, // Default quantity 1
         });
     };
+    const handleAddToCart = (e) => {
+        e.preventDefault();
+        router.post(
+            "/cart/add",
+            {
+                product_id: product.id,
+                quantity: 1,
+            },
+            {
+                onSuccess: () => {
+                    // Optional: Tambahkan notifikasi sukses
+                    alert("Product added to cart successfully!");
+                },
+                onError: (errors) => {
+                    if (errors?.message === "Unauthenticated.") {
+                        window.location.href = "/login";
+                    }
+                },
+            }
+        );
+    };
 
     return (
         <div className="border border-slate-200 flex flex-col p-4 rounded-lg">
@@ -154,7 +175,10 @@ const ProductCard = ({ product, isWishlist = false, onToggleWishlist }) => {
                     )}
                 </span>
             </Link>
-            <button className="bg-[#A1E870] rounded-lg py-2 mt-2 w-full text-primary font-medium">
+            <button
+                onClick={handleAddToCart}
+                className="bg-[#A1E870] rounded-lg py-2 mt-2 w-full text-primary font-medium"
+            >
                 Add To Cart
             </button>
         </div>

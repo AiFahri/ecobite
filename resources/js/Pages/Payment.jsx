@@ -16,13 +16,11 @@ import { usePage, router } from "@inertiajs/react";
 
 const Payment = () => {
     const { flash } = usePage().props;
-    const { address, product, quantity, delivery_fee, promo_voucher } = usePage().props;
+    const { address, product, quantity, delivery_fee, promo_voucher, auth } = usePage().props;
     const [selectedAddress, setSelectedAddress] = useState({
         id: "test-address-id",
         address: "Jl. Yos Sudarso, Kec. Dringu, Probolinggo, Jawa",
     });
-
-    console.log("Payment Page Props:", usePage().props);
 
     useEffect(() => {
         // Load Midtrans script
@@ -106,7 +104,7 @@ const Payment = () => {
 
     return (
         <div className="min-h-screen flex flex-col">
-            <Navbar />
+            <Navbar auth={auth} />
 
             <div className="flex-grow">
                 <section>
