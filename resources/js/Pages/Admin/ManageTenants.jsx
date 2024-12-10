@@ -32,6 +32,9 @@ export default function manageTenants() {
                 <table className="min-w-full bg-white border border-gray-200 rounded-lg">
                     <thead className="bg-gray-100">
                         <tr>
+                            <th className="text-center px-6 py-3 text-gray-600 font-semibold uppercase tracking-wider">
+                                No
+                            </th>
                             <th className="text-left px-6 py-3 text-gray-600 font-semibold uppercase tracking-wider">
                                 Name
                             </th>
@@ -44,13 +47,16 @@ export default function manageTenants() {
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200">
-                        {tenants.map((tenants) => (
-                            <tr key={tenants.id} className="hover:bg-gray-50">
-                                <td className="px-6 py-4 text-gray-900">{tenants.name}</td>
-                                <td className="px-6 py-4 text-gray-600">{tenants.city}</td>
+                        {tenants.data.map((tenant, index) => (
+                            <tr key={tenant.id} className="hover:bg-gray-50">
+                                <td className="px-6 py-4 text-gray-900 text-center">
+                                    {index + 1 + (tenants.current_page - 1) * tenants.per_page}
+                                </td>
+                                <td className="px-6 py-4 text-gray-900">{tenant.name}</td>
+                                <td className="px-6 py-4 text-gray-600">{tenant.city}</td>
                                 <td className="px-6 py-4 flex space-x-2">
                                     <Link
-                                        href={route("admin.manageTenants.edit", tenants.id)}
+                                        href={route("admin.manageTenants.edit", tenant.id)}
                                         className="bg-yellow-500 text-white px-4 py-2 rounded-md hover:bg-yellow-600"
                                     >
                                         Edit
@@ -58,13 +64,13 @@ export default function manageTenants() {
                                     <Link
                                         as="button"
                                         method="delete"
-                                        href={route("admin.manageTenants.destroy", tenants.id)}
+                                        href={route("admin.manageTenants.destroy", tenant.id)}
                                         className={`px-4 py-2 rounded-md text-white ${
-                                            tenants.id === auth.user.id
+                                            tenant.id === auth.user.id
                                                 ? "bg-gray-400 cursor-not-allowed"
                                                 : "bg-red-500 hover:bg-red-600"
                                         }`}
-                                        disabled={tenants.id === auth.user.id}
+                                        disabled={tenant.id === auth.user.id}
                                     >
                                         Delete
                                     </Link>
@@ -73,6 +79,30 @@ export default function manageTenants() {
                         ))}
                     </tbody>
                 </table>
+            </div>
+            {/* Pagination */}
+            <div className="flex justify-between items-center mt-6">
+                {/* Previous Button */}
+                {tenants.prev_page_url && (
+                    <Link
+                        href={tenants.prev_page_url}
+                        className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600"
+                    >
+                        Previous
+                    </Link>
+                )}
+                <span>
+                    Page {tenants.current_page} of {tenants.last_page}
+                </span>
+                {/* Next Button */}
+                {tenants.next_page_url && (
+                    <Link
+                        href={tenants.next_page_url}
+                        className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600"
+                    >
+                        Next
+                    </Link>
+                )}
             </div>
         </div>
     );

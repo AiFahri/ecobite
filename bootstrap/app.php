@@ -21,6 +21,9 @@ return Application::configure(basePath: dirname(__DIR__))
             HandleInertiaRequests::class,
         ]);
     })
+    // ->withMiddleware(function (Middleware $middleware) {
+    //     $middleware->alias('auth.admin', AuthenticateAdmin::class);
+    // })
     ->withMiddleware(function (Middleware $middleware) {
 
         $middleware->alias([
@@ -36,7 +39,13 @@ return Application::configure(basePath: dirname(__DIR__))
                 }
                 return $next($request);
             },
-            'payment' => \App\Http\Middleware\PaymentMiddleware::class
+            'payment' => \App\Http\Middleware\PaymentMiddleware::class,
+            'auth.admin' => \App\Http\Middleware\AuthenticateAdmin::class,
+        ]);
+    })
+    ->withMiddleware(function (Middleware $middleware) {
+        $middleware->validateCsrfTokens(except: [
+            'payment/validate',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

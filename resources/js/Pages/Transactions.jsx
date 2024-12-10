@@ -138,14 +138,19 @@ const Transactions = () => {
                                                         .product.tenant.name
                                                 }
                                             </span>
-                                            {transaction.transaction_items[0]
-                                                .product.tenant.is_verified && (
-                                                <span className="bg-blue-100 text-blue-600 text-xs px-2 py-1 rounded-full">
-                                                    Verified
-                                                </span>
-                                            )}
+                                            {transaction.transaction_items[0].product.tenant.is_verified
+                                                ? (
+                                                    <span className="bg-blue-100 text-blue-600 text-xs px-2 py-1 rounded-full">
+                                                        Verified
+                                                    </span>
+                                                )
+                                                : null}
                                             <span className="text-gray-500 text-sm">
-                                                {transaction.created_at}
+                                            {new Date(transaction.created_at).toLocaleDateString("id-ID", {
+                                                day: "2-digit",
+                                                month: "long",
+                                                year: "numeric",
+                                            })}
                                             </span>
                                             <span className="text-green-600 text-sm bg-green-50 px-2 py-1 rounded-full">
                                                 {transaction.status}
@@ -212,20 +217,11 @@ const Transactions = () => {
                                                     </div>
                                                     Total:
                                                     <p className="text-sm text-gray-600 mt-2">
-                                                        {
-                                                            transaction
-                                                                .transaction_items[0]
-                                                                .quantity
-                                                        }{" "}
-                                                        items x Rp{" "}
-                                                        {(
-                                                            transaction
-                                                                .transaction_items[0]
-                                                                .product.price /
-                                                            transaction
-                                                                .transaction_items[0]
-                                                                .product.stocks
-                                                        ).toLocaleString()}
+                                                    {transaction.transaction_items?.[0]?.quantity} items x Rp{" "}
+                                                    {(
+                                                        (transaction.transaction_items?.[0]?.product?.price || 0) /
+                                                        (transaction.transaction_items?.[0]?.product?.stocks || 1)
+                                                    ).toLocaleString()}
                                                     </p>
                                                 </div>
                                             </div>

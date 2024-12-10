@@ -15,6 +15,7 @@ Route::get('/', function () {
 });
 
 use App\Http\Controllers\HomeController;
+use Faker\Provider\ar_EG\Payment;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
@@ -52,9 +53,7 @@ Route::get('/admin/superadmin', function () {
     return Inertia::render('Admin/SuperAdmin');
 });
 
-Route::get('/map', function () {
-    return Inertia::render('Map');
-});
+Route::post('/payment/validate', [PaymentController::class, 'validatePayment'])->name('payment.validate');
 
 
 // Route::get('/pre', function () {
@@ -62,8 +61,8 @@ Route::get('/map', function () {
 //     return view('pre');
 // })->name('pre');
 
-Route::get('/pre2', function () {
-    return view('pre2');
-})->name('pre2');
+Route::get('/pre', function () {
+    return Inertia::render('Pre');
+})->name('pre');
 
 require __DIR__ . '/auth.php';

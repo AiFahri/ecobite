@@ -15,10 +15,10 @@ const TransactionFilter = () => {
     });
 
     const statusOptions = [
-        { name: "Pending", value: "waiting-for-payment" },
-        { name: "Processing", value: "processing" },
+        { name: "Wait For Payment", value: "waiting-for-payment" },
+        { name: "On Delivery", value: "on-delivery" },
         { name: "Completed", value: "completed" },
-        { name: "Cancelled", value: "cancelled" },
+        { name: "Cancel", value: "cancel" },
     ];
 
     const handleStatusChange = (status) => {
@@ -43,12 +43,20 @@ const TransactionFilter = () => {
     };
 
     const applyFilters = (newFilters) => {
-        router.get("/transactions", newFilters, {
+        // Hapus parameter dengan nilai kosong
+        const filteredParams = Object.fromEntries(
+            Object.entries(newFilters).filter(
+                ([_, value]) => value !== "" && value !== undefined
+            )
+        );
+    
+        router.get("/transactions", filteredParams, {
             preserveState: true,
             preserveScroll: true,
             replace: true,
         });
     };
+    
 
     const toggleSection = (section) => {
         setExpandedSections((prev) => ({

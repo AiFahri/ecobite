@@ -11,11 +11,19 @@ class AdminManagementController extends Controller
 {
     public function index()
     {
-        $admins = Admin::all();
+        $auth = auth('admin')->user();
+        $admins = Admin::with('tenant');
+
+        if (!is_null($auth->tenant_id)) {
+            $admins = $admins->where('tenant_id', $auth->tenant_id);
+        }
+
+        $admins = $admins->orderByRaw('ISNULL(tenant_id) DESC')->paginate(10);
+
         return Inertia::render('Admin/ManageAdmins', [
             'admins' => $admins,
             'auth' => [
-                'user' => auth()->user(),
+                'user' => $auth,
             ],
         ]);
     }
@@ -32,7 +40,7 @@ class AdminManagementController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:admins,email',
             'password' => 'required|string|min:8',
-            'tenant_id' => 'required|exists:tenants,id',
+            'tenant_id' => 'nullable|exists:tenants,id',
         ]);
 
         Admin::create([
@@ -63,7 +71,7 @@ class AdminManagementController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:admins,email,' . $admin->id,
             'password' => 'nullable|string|min:8',
-            'tenant_id' => 'required|exists:tenants,id',
+            'tenant_id' => 'nullable|exists:tenants,id',
         ]);
 
         $admin->update([
@@ -73,7 +81,7 @@ class AdminManagementController extends Controller
             'tenant_id' => $validated['tenant_id'],
         ]);
 
-        return redirect()->route('admin.manageAdmins.edit', $admin->id)
+        return redirect()->route('admin.manageAdmins')
             ->with('success', 'Admin updated successfully.');
     }
 

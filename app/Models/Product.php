@@ -13,9 +13,12 @@ class Product extends Model
 
     protected $fillable = [
         'name',
+        'description',
         'price',
-        'quantity',
-        'category_id'
+        'discount_price',
+        'stock',
+        'tenant_id',
+        'product_type_id'
     ];
 
     public function transactionItems()
@@ -30,7 +33,7 @@ class Product extends Model
 
     public function tenant()
     {
-        return $this->belongsTo(Tenant::class, 'tenant_id', 'id');
+        return $this->belongsTo(Tenant::class, 'tenant_id');
     }
 
     public function productType()

@@ -10,7 +10,9 @@ class AdminController extends Controller
 {
     public function index()
     {
-        return Inertia::render('Admin/Dashboard'); // Komponen React untuk dashboard admin
+        return Inertia::render('Admin/Dashboard', [
+            'auth' => auth('admin')->user(),
+        ]); // Komponen React untuk dashboard admin
     }
 
     public function create()

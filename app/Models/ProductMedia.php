@@ -10,6 +10,11 @@ class ProductMedia extends Model
     use HasUlids;
     protected $table = 'product_media';
 
+    protected $fillable = [
+        'photo_url',
+        'product_id',
+    ];
+
     public function products()
     {
         return $this->hasMany(ProductMedia::class, 'product_id', 'id');

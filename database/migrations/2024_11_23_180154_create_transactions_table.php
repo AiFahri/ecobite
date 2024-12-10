@@ -19,6 +19,7 @@ return new class extends Migration
             $table->uuid('token');
             $table->timestamps();
             $table->foreignUlid('address_id')->constrained('addresses')->onDelete('cascade');
+            $table->foreignUlid('employee_id')->nullable()->constrained('employees')->onDelete('cascade');
         });
     }
 

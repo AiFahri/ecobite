@@ -41,7 +41,7 @@ class HandleInertiaRequests extends Middleware
                 ] : null;
             },
             'flash' => [
-                'message' => fn () => $request->session()->get('message')
+                'message' => fn() => $request->session()->get('message')
             ],
             'cartItems' => function () use ($request) {
                 if ($request->user()) {

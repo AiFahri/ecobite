@@ -2,22 +2,31 @@ import React from "react";
 import { useForm, Link, usePage } from "@inertiajs/react";
 
 export default function CreateTenant() {
-    const { tenants } = usePage().props; // Mengakses data tenants dari props
+    const { tenantTypes } = usePage().props; // Mengakses tenantTypes dari props
+
     const { data, setData, post, errors } = useForm({
         name: "",
         stars: "",
         is_verified: false,
-        photo_url: "",
+        photo: null, // Untuk file upload
         city: "",
         state: "",
         postal_code: "",
         latitude: "",
         longitude: "",
+        tenant_type_id: "", // Default value untuk tenant type
     });
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        post(route("admin.manageAdmins.store"));
+        const formData = new FormData();
+        for (const key in data) {
+            formData.append(key, data[key]);
+        }
+        console.log(data); // Debug data sebelum dikirim
+        post(route("admin.manageTenants.store"), formData, {
+            forceFormData: true, // Pastikan form dikirim sebagai multipart/form-data
+        });
     };
 
     return (
@@ -31,7 +40,7 @@ export default function CreateTenant() {
                     Back to Manage Tenants
                 </Link>
             </div>
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} encType="multipart/form-data">
                 <div className="mb-4">
                     <label className="block">Name</label>
                     <input
@@ -42,6 +51,7 @@ export default function CreateTenant() {
                     />
                     {errors.name && <div className="text-red-500">{errors.name}</div>}
                 </div>
+
                 <div className="mb-4">
                     <label className="block">Stars</label>
                     <input
@@ -52,6 +62,7 @@ export default function CreateTenant() {
                     />
                     {errors.stars && <div className="text-red-500">{errors.stars}</div>}
                 </div>
+
                 <div className="mb-4">
                     <label className="block">Is Verified</label>
                     <input
@@ -62,6 +73,7 @@ export default function CreateTenant() {
                     />
                     {errors.is_verified && <div className="text-red-500">{errors.is_verified}</div>}
                 </div>
+
                 <div className="mb-4">
                     <label className="block">Photo</label>
                     <input
@@ -82,6 +94,7 @@ export default function CreateTenant() {
                     />
                     {errors.city && <div className="text-red-500">{errors.city}</div>}
                 </div>
+
                 <div className="mb-4">
                     <label className="block">State</label>
                     <input
@@ -92,6 +105,7 @@ export default function CreateTenant() {
                     />
                     {errors.state && <div className="text-red-500">{errors.state}</div>}
                 </div>
+
                 <div className="mb-4">
                     <label className="block">Postal Code</label>
                     <input
@@ -100,8 +114,11 @@ export default function CreateTenant() {
                         onChange={(e) => setData("postal_code", e.target.value)}
                         className="border rounded w-full px-3 py-2"
                     />
-                    {errors.postal_code && <div className="text-red-500">{errors.postal_code}</div>}
+                    {errors.postal_code && (
+                        <div className="text-red-500">{errors.postal_code}</div>
+                    )}
                 </div>
+
                 <div className="mb-4">
                     <label className="block">Latitude</label>
                     <input
@@ -112,6 +129,7 @@ export default function CreateTenant() {
                     />
                     {errors.latitude && <div className="text-red-500">{errors.latitude}</div>}
                 </div>
+
                 <div className="mb-4">
                     <label className="block">Longitude</label>
                     <input
@@ -121,6 +139,26 @@ export default function CreateTenant() {
                         className="border rounded w-full px-3 py-2"
                     />
                     {errors.longitude && <div className="text-red-500">{errors.longitude}</div>}
+                </div>
+
+                <div className="mb-4">
+                    <label className="block">Tenant Type</label>
+                    <select
+                        value={data.tenant_type_id}
+                        onChange={(e) => setData("tenant_type_id", e.target.value)}
+                        className="border rounded w-full px-3 py-2"
+                    >
+                        <option value="">Select a Tenant Type</option>
+                        {tenantTypes.map((type) => (
+                            <option key={type.id} value={type.id}>
+                                {type.name}
+                            </option>
+                        ))}
+                    </select>
+
+                    {errors.tenant_type_id && (
+                        <div className="text-red-500">{errors.tenant_type_id}</div>
+                    )}
                 </div>
 
                 <button

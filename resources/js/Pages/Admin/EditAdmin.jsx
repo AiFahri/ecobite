@@ -27,6 +27,7 @@ export default function EditAdmin({ admin }) {
                     Back to Manage Admins
                 </Link>
             </div>
+            
             <form onSubmit={handleSubmit}>
                 <div className="mb-4">
                     <label className="block">Name</label>

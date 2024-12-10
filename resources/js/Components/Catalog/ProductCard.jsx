@@ -162,13 +162,13 @@ const ProductCard = ({ product, isWishlist = false, onToggleWishlist }) => {
                     <span className="flex items-baseline">
                         <p className={`text-xs mr-2 text-primary`}>Rp</p>
                         <p className={`text-xl font-bold mr-3 text-primary`}>
-                            {formatPrice(product.price)}
+                            {formatPrice(product.oldPrice)}
                         </p>
                     </span>
                     {product.oldPrice && (
                         <span className="relative">
                             <p className="text-md text-red-500">
-                                Rp {formatPrice(product.oldPrice)}
+                            Rp {formatPrice(product.price)}
                             </p>
                             <div className="absolute top-1/2 border border-black w-full"></div>
                         </span>

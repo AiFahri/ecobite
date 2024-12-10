@@ -17,6 +17,7 @@ class Transaction extends Model
         'payment_type',
         'token',
         'address_id',
+        'employee_id'
     ];
 
     public function transactionItems()
@@ -27,5 +28,10 @@ class Transaction extends Model
     public function address()
     {
         return $this->belongsTo(Address::class, 'address_id'); // Foreign key: address_id
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }

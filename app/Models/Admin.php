@@ -21,4 +21,9 @@ class Admin extends Authenticatable
         'password',
         'remember_token',
     ];
+
+    public function tenant()
+    {
+        return $this->belongsTo(Tenant::class);
+    }
 }
