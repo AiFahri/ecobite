@@ -23,10 +23,10 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
 
-        if (app()->environment('local')) {
-            URL::forceScheme('https');
-            $this->app['request']->server->set('HTTPS', 'on');
-        }
+        // if (app()->environment('local')) {
+        //     URL::forceScheme('https');
+        //     $this->app['request']->server->set('HTTPS', 'on');
+        // }
 
         Vite::prefetch(concurrency: 3);
         Inertia::share([

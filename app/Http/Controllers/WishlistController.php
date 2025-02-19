@@ -77,30 +77,30 @@ class WishlistController extends Controller
         }
 
         // Get product types dengan count - Hanya untuk produk di wishlist
-        $productTypes = ProductType::whereHas('products', function($query) use ($user) {
-            $query->whereHas('wishlists', function($q) use ($user) {
+        $productTypes = ProductType::whereHas('products', function ($query) use ($user) {
+            $query->whereHas('wishlists', function ($q) use ($user) {
                 $q->where('user_id', $user->id);
             });
         })
-        ->withCount(['products' => function($query) use ($user) {
-            $query->whereHas('wishlists', function($q) use ($user) {
-                $q->where('user_id', $user->id);
+            ->withCount(['products' => function ($query) use ($user) {
+                $query->whereHas('wishlists', function ($q) use ($user) {
+                    $q->where('user_id', $user->id);
+                });
+            }])
+            ->orderBy('products_count', 'DESC')
+            ->get(['name'])
+            ->map(function ($type) {
+                return [
+                    'name' => $type->name,
+                    'total' => $type->products_count,
+                ];
             });
-        }])
-        ->orderBy('products_count', 'DESC')
-        ->get(['name'])
-        ->map(function ($type) {
-            return [
-                'name' => $type->name,
-                'total' => $type->products_count,
-            ];
-        });
 
         // Get tenant types
         $tenantTypes = TenantType::orderBy('created_at')->pluck('name');
 
         // Get star count - Perbaikan untuk akurasi rating
-        $starCount = collect(range(1, 5))->map(function($rating) use ($user) {
+        $starCount = collect(range(1, 5))->map(function ($rating) use ($user) {
             $count = DB::table('products')
                 ->join('wishlists', 'products.id', '=', 'wishlists.product_id')
                 ->where('wishlists.user_id', $user->id)
@@ -122,7 +122,7 @@ class WishlistController extends Controller
 
         // Alternative approach jika yang di atas masih error
         if ($starCount->sum('total_products') === 0) {
-            $starCount = collect(range(1, 5))->map(function($rating) {
+            $starCount = collect(range(1, 5))->map(function ($rating) {
                 return [
                     'rating_group' => $rating,
                     'total_products' => 0
@@ -132,7 +132,7 @@ class WishlistController extends Controller
 
         // Pagination dengan transformasi data
         $wishlists = $wishlists->paginate(12)->withQueryString();
-        
+
         // Transform data pagination untuk frontend
         $wishlists->through(function ($wishlist) {
             return [
@@ -141,7 +141,7 @@ class WishlistController extends Controller
                     'id' => $wishlist->product->id,
                     'name' => $wishlist->product->name,
                     'price' => $wishlist->product->price,
-                    'original_price' => $wishlist->product->original_price,
+                    'original_price' => $wishlist->product->discount_price,
                     'tenant' => [
                         'name' => $wishlist->product->tenant?->name,
                         'is_verified' => $wishlist->product->tenant?->is_verified,

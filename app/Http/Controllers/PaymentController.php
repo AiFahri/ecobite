@@ -169,8 +169,9 @@ class PaymentController extends Controller
         $transactionID = $request->query("order_id");
 
         $transaction = Transaction::with([
-            'transactionItems.product.tenant',
-            'address.user'
+            'transactionItems.product.tenant', // Tetap memuat tenant jika diperlukan
+            'address.user',
+            'employee' // Memuat relasi employee berdasarkan employee_id di transactions
         ])
             ->where('id', $transactionID)
             ->whereHas('address.user', function ($query) use ($auth) {

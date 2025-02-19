@@ -379,7 +379,7 @@ const ProductDetail = () => {
                         <PriceDetail
                             product={{
                                 ...productData,
-                                oldPrice: productData.discount_price || null,
+                                oldPrice: productData.price || null,
                             }}
                         />
                         <div className="rounded-lg mt-8 overflow-hidden">

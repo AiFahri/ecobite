@@ -11,6 +11,8 @@ const SimilarSection = ({ similarProducts }) => {
         message: null,
     };
 
+    console.log(similarProducts);
+
     if (!data || data.length === 0) {
         return (
             <div className="container max-w-screen-xl mx-auto font-outfit mt-10">
@@ -117,8 +119,7 @@ const SimilarSection = ({ similarProducts }) => {
                                 store: product.tenant?.name || product.store,
                                 rating: product.avg_stars || product.rating,
                                 verified:
-                                    product.tenant?.is_verified ||
-                                    product.verified,
+                                    product.tenant?.is_verified,
                             }}
                             isWishlist={product.is_wishlisted}
                             onToggleWishlist={() =>

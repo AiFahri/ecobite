@@ -6,12 +6,14 @@ import L from "leaflet";
 import axios from "axios";
 import Navbar from "@/Components/Navbar";
 import Footer from "@/Components/Footer";
-import { useForm, Link, usePage } from "@inertiajs/react";
+import { usePage } from "@inertiajs/react";
 
 // Import icon images
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
+import homeIconUrl from "../../assets/assets/Home.png";
+import motorIconUrl from "../../assets/assets/Bike.jpg";
 
 // Mengatasi masalah icon default Leaflet
 delete L.Icon.Default.prototype._getIconUrl;
@@ -27,62 +29,78 @@ const Map = () => {
     const [endPoint, setEndPoint] = useState(null);
     const [route, setRoute] = useState([]);
 
-    console.log('aw');
+    console.log(transaction);
 
+    // Definisikan ikon khusus
+    const homeIcon = L.icon({
+        iconUrl: homeIconUrl,
+        iconSize: [32, 32], // Ukuran ikon
+        iconAnchor: [16, 32], // Titik jangkar ikon
+        popupAnchor: [0, -32], // Posisi popup relatif terhadap ikon
+    });
+
+    const motorIcon = L.icon({
+        iconUrl: motorIconUrl,
+        iconSize: [32, 32],
+        iconAnchor: [16, 32],
+        popupAnchor: [0, -32],
+    });
+
+    // Set startPoint dan endPoint saat data transaction tersedia
     useEffect(() => {
         if (transaction) {
-            setStartPoint([
+            const initialStart = [
                 transaction.transaction_items[0].product.tenant.latitude,
                 transaction.transaction_items[0].product.tenant.longitude,
-            ]);
-            setEndPoint([
+            ];
+            const initialEnd = [
                 transaction.address.latitude,
                 transaction.address.longitude,
-            ]);
+            ];
+            setStartPoint(initialStart);
+            setEndPoint(initialEnd);
         }
     }, [transaction]);
 
-    // Fetch route initially and set interval
+    // Hitung rute sekali setelah startPoint dan endPoint ditentukan
     useEffect(() => {
-        const fetchData = async () => {
-            if (transaction) {
+        const fetchRoute = async () => {
+            if (startPoint && endPoint) {
                 try {
-                    // Get updated transaction data
-                    const response = await axios.get(`/map/${transaction.id}`);
-                    const updatedTransaction = response.data;
-
-                    console.log(updatedTransaction  );
-
-                    const newStartPoint = [
-                        updatedTransaction.latitude,
-                        updatedTransaction.longitude,
-                    ];
-                    // const newEndPoint = [
-                    //     updatedTransaction.address.latitude,
-                    //     updatedTransaction.address.longitude,
-                    // ];
-
-                    // Update startPoint and endPoint
-                    setStartPoint(newStartPoint);
-                    // setEndPoint(newEndPoint);
-
-                    // Fetch route using updated startPoint and endPoint
-                    const url = `https://routing.openstreetmap.de/routed-car/route/v1/driving/${newStartPoint[1]},${newStartPoint[0]};${endPoint[1]},${endPoint[0]}?overview=full&geometries=geojson`;
+                    // Panggil endpoint routing sekali saja
+                    const url = `https://router.project-osrm.org/route/v1/driving/${startPoint[1]},${startPoint[0]};${endPoint[1]},${endPoint[0]}?overview=full&geometries=geojson`;
                     const routeResponse = await axios.get(url);
                     const coordinates = routeResponse.data.routes[0]?.geometry?.coordinates || [];
                     setRoute(coordinates.map((coord) => [coord[1], coord[0]]));
-                    console.log('aw');
                 } catch (error) {
-                    console.error("Error updating route:", error);
+                    console.error("Error fetching route:", error);
                 }
             }
         };
 
-        // Fetch route immediately and set interval for polling
-        fetchData();
-        const interval = setInterval(fetchData, 1000);
+        fetchRoute();
+    }, [startPoint, endPoint]);
 
-        // Cleanup interval on unmount
+    // Interval hanya untuk update posisi driver tanpa fetching rute ulang
+    useEffect(() => {
+        const updateDriverPosition = async () => {
+            if (transaction) {
+                try {
+                    const response = await axios.get(`/map/${transaction.id}`);
+                    const updatedTransaction = response.data;
+                    const newStartPoint = [
+                        updatedTransaction.latitude,
+                        updatedTransaction.longitude,
+                    ];
+                    // Update hanya posisi startPoint (driver), jangan fetch route lagi
+                    setStartPoint(newStartPoint);
+                } catch (error) {
+                    console.error("Error updating driver position:", error);
+                }
+            }
+        };
+
+        const interval = setInterval(updateDriverPosition, 5000);
         return () => clearInterval(interval);
     }, [transaction]);
 
@@ -92,14 +110,26 @@ const Map = () => {
             <Navbar auth={auth} />
 
             <div className="max-w-screen-xl mx-auto px-4 py-8">
-                <div className="mb-8">
-                    <h1 className="text-2xl font-semibold text-gray-800 mb-4">
-                        Pencari Rute OpenStreetMap
-                    </h1>
-                    <p className="text-gray-600 mb-4">
-                        Peta ini akan memperbarui lokasi dan rute secara otomatis setiap 5 detik.
-                    </p>
+            <div className="mb-8">
+                <h1 className="text-2xl font-semibold text-gray-800 mb-4">
+                    Detail Driver
+                </h1>
+                <div className="flex items-center space-x-4">
+                    <img
+                        src={transaction.employee.photo_url}
+                        alt={`Foto Profil ${transaction.employee.name}`}
+                        className="w-16 h-16 rounded-full border border-gray-300"
+                    />
+                    <div>
+                        <p className="text-gray-600 mb-2">
+                            Nama: {transaction.employee.name}
+                        </p>
+                        <p className="text-gray-600 mb-2">
+                            Plat Nomor: {transaction.employee.license_plate}
+                        </p>
+                    </div>
                 </div>
+            </div>
 
                 <div className="border rounded-lg overflow-hidden shadow-lg">
                     <MapContainer
@@ -112,8 +142,8 @@ const Map = () => {
                             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                             attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
                         />
-                        {startPoint && <Marker position={startPoint} />}
-                        {endPoint && <Marker position={endPoint} />}
+                        {startPoint && <Marker position={startPoint} icon={motorIcon} />}
+                        {endPoint && <Marker position={endPoint} icon={homeIcon} />}
                         {route.length > 0 && <Polyline positions={route} color="blue" />}
                     </MapContainer>
                 </div>

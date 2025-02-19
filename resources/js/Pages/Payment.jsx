@@ -187,7 +187,7 @@ const Payment = () => {
                                                 <p>
                                                     Rp{" "}
                                                     {(
-                                                        product.price *
+                                                        product.discount_price *
                                                         product.quantity
                                                     ).toLocaleString()}
                                                 </p>

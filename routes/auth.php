@@ -56,7 +56,9 @@ Route::middleware('auth.admin')->prefix('admin')->name('admin.')->group(function
     Route::put('manage-tenants/{id}/edit', [TenantManagementController::class, 'update'])->name('manageTenants.update');
     Route::delete('manage-tenants/{id}', [TenantManagementController::class, 'destroy'])->name('manageTenants.destroy');
 
-    Route::get('manage-transactions', [TransactionManagementController::class, 'index'])->name('manageTransactions');
+    Route::any('manage-transactions', [TransactionManagementController::class, 'index'])->name('manageTransactions');
+    Route::get('manage-transactions/{id}/edit', [TransactionManagementController::class, 'edit'])->name('manageTransactions.edit');
+    Route::put('manage-transactions/{id}/edit', [TransactionManagementController::class, 'update'])->name('manageTransactions.update');
 
     Route::any('manage-products', [ProductManagementController::class, 'index'])->name('manageProducts');
     Route::get('manage-products/create', [ProductManagementController::class, 'create'])->name('manageProducts.create');

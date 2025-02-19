@@ -82,7 +82,7 @@ export default function ManageTransactions() {
                                     <td className="px-6 py-4 flex space-x-2 text-center">
                                         <Link
                                             href={transaction.status === 'waiting-for-driver' 
-                                                ? route("admin.manageAdmins.edit", transaction.id) 
+                                                ? route("admin.manageTransactions.edit", transaction.id) 
                                                 : "#"}
                                             className={`px-4 py-2 rounded-md ${
                                                 transaction.status === 'waiting-for-driver'

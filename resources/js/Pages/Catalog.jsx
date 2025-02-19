@@ -110,6 +110,8 @@ const Catalog = () => {
         );
     };    
 
+    console.log(products);
+
     return (
         <>
             <div className="overflow-y-scroll no-scrollbar">
@@ -124,7 +126,7 @@ const Catalog = () => {
                             <p className="text-[#173302]">Catalog</p>
                         </span>
                         <h2 className="text-2xl my-6 font-semibold text-[#173302]">
-                            Catalog Page
+                            Catalog
                         </h2>
                         <SearchBar
                             value={searchQuery}
@@ -188,7 +190,7 @@ const Catalog = () => {
                                                             "Unknown Store",
                                                         price: product.price,
                                                         oldPrice:
-                                                            product.original_price,
+                                                            product.discount_price,
                                                         verified:
                                                             product.tenant
                                                                 ?.is_verified ||

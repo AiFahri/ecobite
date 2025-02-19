@@ -205,7 +205,7 @@ const ProductFilter = ({
             <div className="flex items-center space-x-3">
                 <img src={Logo} className="w-6 h-6" alt="Logo" />
                 <div>
-                    <p className="text-secondary text-sm">Explore</p>
+                    <p className="text-secondary text-sm">Catalog</p>
                     <p className="text-[#173302] font-semibold text-lg">
                         Product Filter
                     </p>

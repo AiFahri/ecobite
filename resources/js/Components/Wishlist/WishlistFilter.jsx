@@ -230,9 +230,9 @@ const WishlistFilter = ({
             <div className="flex items-center space-x-3">
                 <img src={Logo} className="w-6 h-6" alt="Logo" />
                 <div>
-                    <p className="text-secondary text-sm">Filter</p>
+                    <p className="text-secondary text-sm">Wishlist</p>
                     <p className="text-[#173302] font-semibold text-lg">
-                        Wishlist
+                    Product Filter
                     </p>
                 </div>
             </div>
@@ -426,7 +426,7 @@ const WishlistFilter = ({
                 {expandedSections.rating && (
                     <div className="mt-4 space-y-4">
                         {starCount.map((rating) => (
-                            <div
+                            rating.total_products > 0 && ( <div
                                 key={rating.rating_group}
                                 className="flex justify-between items-center"
                             >
@@ -459,7 +459,7 @@ const WishlistFilter = ({
                                 <span className="text-gray-500">
                                     {rating.total_products}
                                 </span>
-                            </div>
+                            </div> )
                         ))}
                     </div>
                 )}

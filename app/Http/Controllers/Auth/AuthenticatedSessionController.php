@@ -36,7 +36,6 @@ class AuthenticatedSessionController extends Controller
         $request->authenticate();
 
         $request->session()->regenerate();
-        Log::info('Session regenerated: ' . session()->getId());
 
         return redirect()->intended(route('catalog.index'));
     }

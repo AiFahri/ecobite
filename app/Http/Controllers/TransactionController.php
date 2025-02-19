@@ -34,11 +34,11 @@ class TransactionController extends Controller
         // Tambahkan filter pencarian
         if ($request->has('search')) {
             $search = $request->search;
-            $query->whereHas('transactionItems.product', function($q) use ($search) {
+            $query->whereHas('transactionItems.product', function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhereHas('tenant', function($q2) use ($search) {
-                      $q2->where('name', 'like', "%{$search}%");
-                  });
+                    ->orWhereHas('tenant', function ($q2) use ($search) {
+                        $q2->where('name', 'like', "%{$search}%");
+                    });
             });
         }
 
@@ -66,7 +66,7 @@ class TransactionController extends Controller
     public function showInstantBuy()
     {
         $user = Auth::user();
-        
+
         if (!Session::has('instant-buy')) {
             return redirect()->route('cart.index');
         }
@@ -79,11 +79,11 @@ class TransactionController extends Controller
         foreach ($instantBuy['products'] as $item) {
             $product = Product::with(['tenant', 'productType', 'productMedia'])
                 ->find($item['product_id']);
-                
+
             if ($product) {
                 $product->quantity = $item['quantity'];
                 $products[] = $product;
-                $total += $product->price * $item['quantity'];
+                $total += $product->discount_price ?? $product->price * $item['quantity'];
             }
         }
 
@@ -130,14 +130,14 @@ class TransactionController extends Controller
     public function storeInstantBuy(InstantBuyRequest $request)
     {
         $validated = $request->validated();
-        
+
         // Pastikan data yang disimpan ke session sesuai format
         $instantBuy = [
             'products' => $validated['products'],
             'delivery_fee' => $validated['delivery_fee'],
             'promo_voucher' => $validated['promo_voucher']
         ];
-        
+
         session()->put('instant-buy', $instantBuy);
         return redirect()->route('instant-buy');
     }

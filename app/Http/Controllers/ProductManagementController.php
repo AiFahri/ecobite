@@ -80,6 +80,19 @@ class ProductManagementController extends Controller
             ->with('success', 'Product created successfully.');
     }
 
+    public function edit($id)
+    {
+        $product = Product::with('productMedia')->findOrFail($id);
+        $auth = auth('admin')->user();
+        $productTypes = ProductType::all();
+
+        return Inertia::render('Admin/EditProduct', [
+            'product' => $product,
+            'auth' => $auth,
+            'product_types' => $productTypes
+        ]);
+    }
+
     public function destroy($id)
     {
         $tenant = Product::findOrFail($id);

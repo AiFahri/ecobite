@@ -71,9 +71,9 @@ const TransactionFilter = () => {
             <div className="flex items-center space-x-3">
                 <img src={Logo} className="w-6 h-6" alt="Logo" />
                 <div>
-                    <p className="text-secondary text-sm">Filter</p>
+                    <p className="text-secondary text-sm">Transactions</p>
                     <p className="text-[#173302] font-semibold text-lg">
-                        Transaction
+                        Product Filter
                     </p>
                 </div>
             </div>

@@ -14,6 +14,8 @@ const ProductCard = ({ product, isWishlist = false, onToggleWishlist }) => {
         return price?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     };
 
+    console.log(product);
+
     const handleBookmarkClick = async (e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -87,12 +89,10 @@ const ProductCard = ({ product, isWishlist = false, onToggleWishlist }) => {
                 <span className="relative">
                     {product.oldPrice && (
                         <button className="bg-[#FC5A32] px-2 py-1 absolute top-3 left-2 rounded-lg text-white">
-                            {Math.round(
-                                ((product.oldPrice - product.price) /
-                                    product.oldPrice) *
-                                    100
-                            )}
-                            % Discount
+                            {((product.price - product.oldPrice) / product.price * 100) < 1 
+                                ? ((product.price - product.oldPrice) / product.price * 100).toFixed(1) 
+                                : Math.round((product.price - product.oldPrice) / product.price * 100)
+                            }% Discount
                         </button>
                     )}
                     <img
@@ -134,13 +134,13 @@ const ProductCard = ({ product, isWishlist = false, onToggleWishlist }) => {
                         alt="Store"
                     />
                     <p className="text-sm text-secondary">{product.store}</p>
-                    {product.verified && (
+                    {product.verified ? (
                         <img
                             src={ShieldIcon}
                             className="w-4 h-4 ml-2"
                             alt="Verified"
                         />
-                    )}
+                    ) : null}
                 </span>
                 {
                     <div className="flex items-center mt-2">

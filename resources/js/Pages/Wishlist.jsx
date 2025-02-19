@@ -17,21 +17,21 @@ const Wishlist = () => {
         auth,
     } = usePage().props;
 
+    // State untuk pencarian dan filter produk
     const [searchQuery, setSearchQuery] = useState("");
     const [filteredProducts, setFilteredProducts] = useState(
         wishlists.data || []
     );
 
-    // Effect untuk inisialisasi filter dari URL
+    // Inisialisasi filter dari URL jika ada
     useEffect(() => {
         if (filters) {
             setSearchQuery(filters.search || "");
         }
     }, [filters]);
 
-    // Effect untuk filter products
+    // Filter produk berdasarkan pencarian
     useEffect(() => {
-        // Filter products berdasarkan searchQuery
         if (searchQuery.trim() === "") {
             setFilteredProducts(wishlists.data || []);
         } else {
@@ -47,10 +47,12 @@ const Wishlist = () => {
         }
     }, [searchQuery, wishlists.data]);
 
+    // Handle input pencarian
     const handleSearch = (e) => {
-        setSearchQuery(e.target.value);
+        setSearchQuery(e.target.value); // Perbarui state lokal tanpa memanggil server
     };
 
+    // Kirim query pencarian ke server saat pengguna menekan Enter
     const handleFilter = () => {
         router.get(
             "/wishlist",
@@ -104,9 +106,9 @@ const Wishlist = () => {
                             </h2>
                             <SearchBar
                                 value={searchQuery}
-                                onChange={handleSearch}
-                                onEnter={handleFilter}
-                                placeholder="Search in your wishlist..."
+                                onChange={handleSearch} // Hanya memperbarui state
+                                onEnter={handleFilter} // Kirim query ke server saat Enter
+                                placeholder="Find something here..."
                                 className="w-full mr-12"
                                 currentPath="/wishlist"
                             />
@@ -135,9 +137,9 @@ const Wishlist = () => {
 
                                 {/* Products Grid */}
                                 <div className="col-span-3">
-                                    <div className="grid grid-cols-3 gap-6 mt-0">
-                                        {filteredProducts.length > 0 ? (
-                                            filteredProducts.map((item) => (
+                                    {filteredProducts.length > 0 ? (
+                                        <div className="grid grid-cols-3 gap-6 mt-0">
+                                            {filteredProducts.map((item) => (
                                                 <ProductCard
                                                     key={item.id}
                                                     product={{
@@ -169,115 +171,17 @@ const Wishlist = () => {
                                                         )
                                                     }
                                                 />
-                                            ))
-                                        ) : (
-                                            <div className="col-span-3 text-center py-20">
-                                                <p className="text-2xl font-semibold text-gray-600">
-                                                    No items in your wishlist
-                                                </p>
-                                                <p className="text-gray-400 mt-2">
-                                                    Browse our catalog and add
-                                                    items you like to your
-                                                    wishlist
-                                                </p>
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    {wishlists.data?.length > 0 && (
-                                        <div className="mt-8">
-                                            <div className="flex justify-between items-center">
-                                                <p className="text-slate-400">
-                                                    Showing{" "}
-                                                    <b className="text-black font-normal">
-                                                        {wishlists.from || 0} -{" "}
-                                                        {wishlists.to || 0}
-                                                    </b>{" "}
-                                                    Products From{" "}
-                                                    <b className="text-black font-normal">
-                                                        {wishlists.total || 0}
-                                                    </b>
-                                                    Results
-                                                </p>
-
-                                                <span className="flex">
-                                                    {wishlists.links?.map(
-                                                        (link, i) => {
-                                                            if (
-                                                                link.label ===
-                                                                "&laquo; Previous"
-                                                            ) {
-                                                                return (
-                                                                    <button
-                                                                        key={i}
-                                                                        className={`p-2 mx-1 ${
-                                                                            link.active
-                                                                                ? "bg-[#173302] text-white"
-                                                                                : "border border-slate-200"
-                                                                        } rounded-md w-10 h-10 text-center`}
-                                                                        onClick={() =>
-                                                                            link.url &&
-                                                                            router.get(
-                                                                                link.url
-                                                                            )
-                                                                        }
-                                                                        disabled={
-                                                                            !link.url
-                                                                        }
-                                                                    >
-                                                                        &lt;
-                                                                    </button>
-                                                                );
-                                                            }
-                                                            if (
-                                                                link.label ===
-                                                                "Next &raquo;"
-                                                            ) {
-                                                                return (
-                                                                    <button
-                                                                        key={i}
-                                                                        className={`p-2 mx-1 ${
-                                                                            link.active
-                                                                                ? "bg-[#173302] text-white"
-                                                                                : "border border-slate-200"
-                                                                        } rounded-md w-10 h-10 text-center`}
-                                                                        onClick={() =>
-                                                                            link.url &&
-                                                                            router.get(
-                                                                                link.url
-                                                                            )
-                                                                        }
-                                                                        disabled={
-                                                                            !link.url
-                                                                        }
-                                                                    >
-                                                                        &gt;
-                                                                    </button>
-                                                                );
-                                                            }
-                                                            return (
-                                                                <button
-                                                                    key={i}
-                                                                    className={`p-2 mx-1 ${
-                                                                        link.active
-                                                                            ? "bg-[#173302] text-white"
-                                                                            : "border border-slate-200"
-                                                                    } rounded-md w-10 h-10 text-center`}
-                                                                    onClick={() =>
-                                                                        link.url &&
-                                                                        router.get(
-                                                                            link.url
-                                                                        )
-                                                                    }
-                                                                    dangerouslySetInnerHTML={{
-                                                                        __html: link.label,
-                                                                    }}
-                                                                />
-                                                            );
-                                                        }
-                                                    )}
-                                                </span>
-                                            </div>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <div className="col-span-3 text-center py-20">
+                                            <p className="text-2xl font-semibold text-gray-600">
+                                                No items in your wishlist
+                                            </p>
+                                            <p className="text-gray-400 mt-2">
+                                                Browse our catalog and add
+                                                items you like to your wishlist
+                                            </p>
                                         </div>
                                     )}
                                 </div>

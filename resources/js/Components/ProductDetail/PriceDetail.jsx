@@ -13,7 +13,7 @@ const PriceDetail = ({ product }) => {
         }
     };
 
-    const basePrice = product.price * quantity;
+    const basePrice = product.discount_price * quantity;
     const deliveryFee = 10000;
     const promoVoucher = 10000;
     const totalPrice = basePrice + deliveryFee - promoVoucher;
